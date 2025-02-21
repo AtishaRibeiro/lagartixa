@@ -18,7 +18,7 @@ Additionally, since a texture has a finite resolution, zooming into far means yo
 Although I can't think of any concrete examples, I have seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technicaly level.
 What to do in that case except come up with your own crazy convoluted solution?
 
-The approach I decided to go with was to turns the globe and all of the countries on it into separate 3d meshes.
+The approach I decided to go with was to turn the globe and all of the countries on it into separate 3d meshes.
 It became a small obsessions during the 2 months that I worked on this, to the point that I don't care if there are better methods.
 
 ## Getting the data
@@ -45,7 +45,7 @@ else:
 
 The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).
-<IMG>
+<IMG luxembourg>
 
 In Natural Earth's dataset all borders/shapes are described in a clock-wise order, which is something that will come in handy later on!
 
@@ -71,7 +71,7 @@ def coord_on_sphere(x, y) -> np.ndarray:
     return np.array((x2, y2, z1))
 ```
 
-If we then write all of these 3D points to ab [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the following result:
+If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the following result:
 
 <IMG>
 

@@ -1,0 +1,23 @@
+body {
+  max-width: clamp(5vw, 50rem, 90vw);
+  margin: 0 auto; /* center */
+}
+
+h1 {
+  text-align: center;
+}
+
+pre {
+  color: #edebf5;
+  background: #30264f;
+  padding: 10px;
+  border-radius: 7px;
+}
+
+code:not(pre *) {
+  color: #edebf5;
+  background: #30264f;
+  padding: 3px;
+  border-radius: 4px;
+  
+}
