@@ -1,7 +1,5 @@
 # Turning the globe into a 3D mesh
 
-## Intro
-
 I was working on a video where needed to show different locations on earth. 
 The requirements were pretty straightforward:
 * Country borders

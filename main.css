@@ -1,23 +1,53 @@
+@font-face {
+  font-family: dynapuff;
+  src: url("static/fonts/DynaPuff/DynaPuff-VariableFont_wdth,wght.ttf");
+}
+
+@font-face {
+  font-family: shrikhand;
+  src: url("static/fonts/Shrikhand/Shrikhand-Regular.ttf");
+}
+
+@font-face {
+  font-family: merri;
+  src: url("static/fonts/Merriweather/Merriweather-Bold.ttf");
+}
+
 body {
   max-width: clamp(5vw, 50rem, 90vw);
-  margin: 0 auto; /* center */
+  margin: 0 auto;
+  /* center */
+  background: #F2F2F2;
+  color: #0D0D0D;
+}
+
+#site-logo {
+  display: block;
+  margin: auto;
 }
 
 h1 {
+  font-family: merri;
+  font-size: 40;
   text-align: center;
 }
 
+h2 {
+  font-family: merri;
+  font-size: 30;
+}
+
 pre {
-  color: #edebf5;
-  background: #30264f;
+  color: #515151;
+  background: #CECECE;
   padding: 10px;
   border-radius: 7px;
 }
 
 code:not(pre *) {
-  color: #edebf5;
-  background: #30264f;
+  color: #515151;
+  background: #CECECE;
   padding: 3px;
   border-radius: 4px;
-  
+
 }
