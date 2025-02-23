@@ -1,6 +1,6 @@
 # Turning the globe into a 3D mesh
 
-I was working on a video where needed to show different locations on earth. 
+I was working on a video where I wanted to visualise various locations across the former Soviet Union. 
 The requirements were pretty straightforward:
 * Country borders
 * Region borders (states, provinces, ...)
@@ -9,19 +9,22 @@ The requirements were pretty straightforward:
 * Be able to give countries different colours
 * No satellite imagery
 
-The simplest way one might achieve this is by drawing the country borders to some texture, and wrapping that texture around a 3d mesh.
-It turns out that projecting a 2d object (our texture) onto a sphere or vice versa is not possible without having some distortion somewhere, which violates our "no distortion" rule.
+Due to the USSR being so big, it is near impossible to have no visual distortion on a 2D map; think of the Mercator projection that has huge
+distortions towards the poles. The alternative is thus to just stay in the world of 3D.
+
+The simplest way one might achieve this is by drawing the country borders to some texture, and wrapping that texture around a 3D mesh.
+In that case we will be dealing with distortions again due to the translation from 2D <-> 3D.
 Additionally, since a texture has a finite resolution, zooming into far means you start seeing the pixels which violates our "looks nice when zoomed in" rule.
 
-Although I can't think of any concrete examples, I have seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technicaly level.
+Although I can't think of any concrete examples, I have seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technical level.
 What to do in that case except come up with your own crazy convoluted solution?
 
-The approach I decided to go with was to turn the globe and all of the countries on it into separate 3d meshes.
+The approach I decided to go with was to turn the globe and all of the countries on it into separate 3D meshes.
 It became a small obsessions during the 2 months that I worked on this, to the point that I don't care if there are better methods.
 
 ## Getting the data
 
-All country data was obtained from [Natural Earth](https://www.naturalearthdata.com/) which provides tons of geography data.
+All country data was obtained from [Natural Earth](https://www.naturalearthdata.com/) which provides tons of geographical data.
 This includes the country and region borders that we need.
 
 The data comes in the form of [.shp files](https://en.wikipedia.org/wiki/Shapefile), which we can interpet using `geopandas`.
@@ -43,7 +46,8 @@ else:
 
 The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).
-<IMG luxembourg>
+
+![luxembourg outline](luxembourg.png "TESTING TITLE")
 
 In Natural Earth's dataset all borders/shapes are described in a clock-wise order, which is something that will come in handy later on!
 
@@ -69,13 +73,9 @@ def coord_on_sphere(x, y) -> np.ndarray:
     return np.array((x2, y2, z1))
 ```
 
-If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the following result:
+If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.
 
-<IMG>
-
-From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts.
-
-<IMG>
+![perfect lines](perfect-lines.png) ![faulty lines](faulty-lines.png)
 
 It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.

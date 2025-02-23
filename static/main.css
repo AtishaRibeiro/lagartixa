@@ -17,8 +17,10 @@ body {
   max-width: clamp(5vw, 50rem, 90vw);
   margin: 0 auto;
   /* center */
-  background: #F2F2F2;
+  background: #F6F6F6;
   color: #0D0D0D;
+  font-family: roboto;
+  font-size: 16;
 }
 
 #site-logo {
@@ -39,15 +41,25 @@ h2 {
 
 pre {
   color: #515151;
-  background: #CECECE;
+  background: #F2F0DC;
   padding: 10px;
   border-radius: 7px;
 }
 
+code {
+  font-size: 12;
+}
+
 code:not(pre *) {
   color: #515151;
-  background: #CECECE;
+  background: #F2F0DC;
   padding: 3px;
   border-radius: 4px;
+}
 
+img {
+  mix-blend-mode: darken;
+  /* display: block; */
+  margin: auto;
+  max-width: clamp(5vw, 24rem, 90vw);
 }

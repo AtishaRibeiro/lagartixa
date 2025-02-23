@@ -1,16 +1,32 @@
 from bs4 import BeautifulSoup, Tag
 from marko import Parser, Renderer, convert
+import os
 
 
-def get_header() -> BeautifulSoup:
+def get_header(rel_dir: str) -> BeautifulSoup:
     with open("templates/header.html", "r") as f:
-        return BeautifulSoup(f.read(), "html.parser")
+        soup = BeautifulSoup(f.read(), "html.parser")
+
+    images = soup.find_all("img")
+    for i in images:
+        i["src"] = os.path.join(rel_dir, i["src"])
+
+    return soup
 
 
-def handle_html(html: str, pretty: bool = False):
+def get_relative_dir_offset(dir: str) -> str:
+    if dir == ".":
+        return "."
+    nr_dirs = dir.count("/") + 1
+    return "/".join([".."] * nr_dirs)
+
+
+def handle_html(html: str, dir: str, pretty: bool = False) -> None:
     soup: BeatifulSoup = BeautifulSoup(html, "html.parser")
+    rel_dir = get_relative_dir_offset(dir)
 
-    css = "main.css"
+    css = os.path.join(rel_dir, "static", "main.css")
+    print(css)
     template = f"""
     <html>
     <head><link rel="stylesheet" href={css}></head>
@@ -18,9 +34,7 @@ def handle_html(html: str, pretty: bool = False):
     </html>"""
     new_soup: BeautifulSoup = BeautifulSoup(template, "html.parser")
 
-    header = get_header()
-    # print(header)
-    # new_soup.body.insert(0, header)
+    header = get_header(rel_dir)
     new_soup.body.append(header)
     new_soup.body.append(soup)
 
@@ -29,15 +43,21 @@ def handle_html(html: str, pretty: bool = False):
     return str(new_soup)
 
 
-def main(markdown: str):
+def generate_post_html(name: str) -> None:
+    post_dir = os.path.join("posts", name)
+    markdown = os.path.join(post_dir, "text.md")
     with open(markdown, "r") as f:
-        # p = Parser()
-        # doc = p.parse(f.read())
         html = convert(f.read())
 
-    html = handle_html(html, False)
-    print(html)
+    html = handle_html(html, post_dir, False)
+    html_path = os.path.join(post_dir, f"{name}.html")
+    with open(html_path, "w") as f:
+        f.write(html)
+
+
+def main():
+    generate_post_html("globe")
 
 
 if __name__ == "__main__":
-    main("posts/globe.md")
+    main()
