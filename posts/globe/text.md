@@ -75,7 +75,9 @@ def coord_on_sphere(x, y) -> np.ndarray:
 
 If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.
 
-![perfect lines](perfect-lines.png) ![faulty lines](faulty-lines.png)
+![perfect lines](perfect-lines.jpg) ![faulty lines](faulty-lines.jpg)
+
+![slice-lines](slice-lines.jpg)
 
 It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.
@@ -83,20 +85,21 @@ We will need to come up with a solution to make the lines live on the surface.
 
 ## Journey to the center of the Earth
 
-So far we've been working with a perfect sphere. 3D meshes however are made up of flat triangles and non-curved lines and spheres are famous for being very round and not having any flat surfaces; not a great combination.
+So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.
-<IMG: icosahedron>
+
+![3icos](3icos-numbers.jpg)
 
 In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.
 
-The general implementation looks something like this:
-* Draw a line `l` from `p` to the origin (0, 0, 0) (which is the center of our sphere) 
-* Go over every triangle in the base mesh and verify whether `l` intersects this triangle.
-* If it does this intersection is our new point.
-* If not, continue looking
+![ico-projection](ico-projection.jpg)
 
-<IMG>
+The general implementation looks something like this:
+* Draw a line from `p` to the origin (0, 0, 0) which is the center of our sphere
+* Go over every triangle in the base mesh and verify whether our line intersects this triangle
+* If it does, this intersection is our new point
+* If not, continue looking
 
 Now all our points live on this spherical approximation, consisting of triangles. We will continue for now with a low res icosahedron as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!
 

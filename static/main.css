@@ -20,7 +20,7 @@ body {
   background: #F6F6F6;
   color: #0D0D0D;
   font-family: roboto;
-  font-size: 16;
+  font-size: 17;
 }
 
 #site-logo {
@@ -59,7 +59,18 @@ code:not(pre *) {
 
 img {
   mix-blend-mode: darken;
-  /* display: block; */
+  display: block;
   margin: auto;
+  max-width: clamp(5vw, 40rem, 90vw);
+}
+
+
+/* 2 images next to each other */
+
+p:has(> img:nth-child(2)) {
+  display: flex;
+}
+
+p:has(> img:nth-child(2))>img {
   max-width: clamp(5vw, 24rem, 90vw);
 }
