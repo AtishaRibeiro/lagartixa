@@ -25,18 +25,18 @@ It became a small obsessions during the 2 months that I worked on this, to the p
 <p>All country data was obtained from <a href="https://www.naturalearthdata.com/">Natural Earth</a> which provides tons of geographical data.
 This includes the country and region borders that we need.</p>
 <p>The data comes in the form of <a href="https://en.wikipedia.org/wiki/Shapefile">.shp files</a>, which we can interpet using <code>geopandas</code>.</p>
-<p>EX: Reading Portugal's border from the 1:50M country border dataset:</p>
+<p>EX: Reading Luxembourg's border from the 1:50M country border dataset:</p>
 <pre><code class="language-py">import geopandas as gpd
 
 data = gpd.read_file("ne_50m_admin_0_countries.shp")
-geo_data = data.loc[data["SOVEREIGNT"] == "Portugal"]["geometry"]
+geo_data = data.loc[data["SOVEREIGNT"] == "Luxembourg"]["geometry"]
 # List of list since  countries can consist of multiple borders: main land, islands, enclaves, ...
-portugal: list[list[tuple]] = []
+luxembourg: list[list[tuple]] = []
 if isinstance(geo_data, shapely.MultiPolygon):
     for geom in geo_data.geoms:
-        portugal.append(geom.exterior.coords)
+        luxembourg.append(geom.exterior.coords)
 else:
-    portugal.append(geo_data.exterior.coords)
+    luxembourg.append(geo_data.exterior.coords)
 </code></pre>
 <p>The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).</p>
@@ -69,9 +69,9 @@ We will need to come up with a solution to make the lines live on the surface.</
 <p>So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.</p>
 <p><img alt="3icos" src="3icos-numbers.jpg"/></p>
+<p>We will continue for now with a low res icosahedron (number 1 in the image) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!</p>
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
-<p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
 <p>The general implementation looks something like this:</p>
 <ul>
 <li>
@@ -82,10 +82,11 @@ Draw a line from <strong>P</strong> to the origin (0, 0, 0) which is the center 
 </ul>
 </li>
 </ul>
-<p>Now all our points live on this spherical approximation, consisting of triangles. We will continue for now with a low res icosahedron as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!</p>
+<p>Now all our points live on this spherical approximation, consisting of triangles.</p>
+<p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
 <h2>Connecting the dots</h2>
 <p>Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.</p>
-<p><img alt="crossing-zoom" src="edge-crossing-zoom.jpg"/></p>
+<p><img alt="crossing-zoom" src="edge-crossing-zoom-bad.jpg"/></p>
 <p>Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
 If we name these 2 "problematic" points <strong>A</strong> and <strong>B</strong>, then we want to transform line <strong>AB</strong> so that it follows the surface.
 In order to do that we just split up <strong>AB</strong> into 2 separate lines <strong>AE</strong> and <strong>EB</strong> where <strong>E</strong> is a point on the edge <strong>e</strong> that the 2 triangles have in common. This way <strong>AE</strong> lies completely on the same triangle <strong>A</strong> lives on, and the same goes for <strong>EB</strong> and <strong>B</strong>.</p>
@@ -109,16 +110,18 @@ Calculate <strong>|AX| + |XB|</strong> and <strong>|AZ| + |ZB|</strong><ul>
 <h3>Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>
-<p>&lt;IMG: algorithm visually&gt;</p>
 <ul>
-<li>Put a point <code>P</code> in the middle of <code>AB</code></li>
+<li>Put a point <strong>P</strong> in the middle of <strong>AB</strong></li>
 <li>Scale this point so it it lies outside of our sphere</li>
-<li>Draw a line from <code>P</code> to the origin</li>
-<li>Create a new point <code>C</code> at the intersection of this line with a triangle of our base</li>
-<li>Replace <code>AB</code> with 2 lines: <code>AC</code> and <code>CB</code></li>
+<li>Draw a line from <strong>P</strong> to the origin</li>
+<li>Create a new point <strong>C</strong> at the intersection of this line with a triangle of our base</li>
+<li>Replace <strong>AB</strong> with 2 lines: <strong>AC</strong> and <strong>CB</strong></li>
 </ul>
 <p>We repeat this as many times as necessary until neighbouring points lie on neighbouring triangles, so we can apply algorithm one.</p>
-<p>&lt;IMG: result&gt;</p>
+<video controls="">
+<source src="animations/cross-connecting.webm" type="video/webm"/>
+</video>
+<p><img alt="crossing-zoom" src="edge-crossing-zoom-good.jpg"/></p>
 <p>That looks pretty good already! In fact it satisfies all of our requrements except 1.</p>
 <ul>
 <li>We can add region borders the same way as we did country borders.</li>
