@@ -77,11 +77,10 @@ If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wi
 
 ![perfect lines](perfect-lines.jpg) ![faulty lines](faulty-lines.jpg)
 
-![slice-lines](slice-lines.jpg)
-
 It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.
 
+![slice-lines](slice-lines.jpg)
 
 ## Journey to the center of the Earth
 
@@ -93,35 +92,41 @@ This means that any spherical mesh is just an approximation of the real thing. T
 In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.
 
-![ico-projection](ico-projection.jpg)
+![ico-projection](ico-projection.jpg) ![ico-projection-globe](ico-project-globe.png)
 
 The general implementation looks something like this:
-* Draw a line from `p` to the origin (0, 0, 0) which is the center of our sphere
-* Go over every triangle in the base mesh and verify whether our line intersects this triangle
-* If it does, this intersection is our new point
-* If not, continue looking
+* Draw a line from **P** to the origin (0, 0, 0) which is the center of our sphere
+    * Go over every triangle in the base mesh and verify whether our line intersects this triangle
+    * If it does, this intersection **P'** is our new point
+    * If not, continue looking
 
 Now all our points live on this spherical approximation, consisting of triangles. We will continue for now with a low res icosahedron as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!
 
 ## Connecting the dots
 
-If we connect all our points again we'll see some countries look correct, and others don't. 
-<IMG: comparison>
+Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.
 
-Whenever all points lie on a single triangle there is no issue, but when they cross triangles we have the same problem as before where the line goes through the surface.
-We will need to split up our line `AB` into 2 lines: `AE` and `EB`, where `E` is a point on the edge `e` that the 2 triangles have in common.
-Sounds easy enough, but where does `E` lie exactly? In the middle of the edge or closer to one of its points?
-The exact position of `E` is defined in such a way that the sum both lines is as as small as possible, meaning `min(|AE| + |EB|)`.
+![crossing-zoom](edge-crossing-zoom.jpg)
+
+Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
+If we name these 2 "problematic" points **A** and **B**, then we want to transform line **AB** so that it follows the surface.
+In order to do that we just split up **AB** into 2 separate lines **AE** and **EB** where **E** is a point on the edge **e** that the 2 triangles have in common. This way **AE** lies completely on the same triangle **A** lives on, and the same goes for **EB** and **B**.
+
+Sounds easy enough, but where does **E** lie exactly? In the middle of the edge or closer to one of its points?
+The exact position of **E** is defined in such a way that the sum both lines is as as small as possible, meaning **min(|AE| + |EB|)**.
 There might be a cool formula for this, but I went with an iterative approach where:
-* Divide `e` in 3 equally spaced points `X`, `Y`, `Z`
-* Calculate `|AX| + |XB|` and `|AZ| + |ZB|`
-  * If `X` gives the shorter path, make `e = eY` 
-  * If `Z` gives the shorter path, make `e = Ye` 
+* Divide **e** in 3 equally spaced points **X**, **Y**, **Z**
+* Calculate **|AX| + |XB|** and **|AZ| + |ZB|**
+  * If **X** gives the shorter path, make **e = e<sub>1</sub>Y** 
+  * If **Z** gives the shorter path, make **e = Ye<sub>2</sub>** 
 * Repeat
 
-<IMG: algorithm visually> 
-
 We can repeat this as many times as we like, I chose 15 as it seemed to give accurate enough results.
+
+<video controls>
+    <source src="animations/connecting.webm" type="video/webm"/>
+</video>
+
 
 ### Crossing multiple triangles
 

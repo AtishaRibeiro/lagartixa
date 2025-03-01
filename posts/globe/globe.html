@@ -62,44 +62,50 @@ The following function transforms a coordinate into a point in 3D space on a sph
 </code></pre>
 <p>If we then write all of these 3D points to an <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">.OBJ</a> file and connect them using <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements">lines</a> we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.</p>
 <p><img alt="perfect lines" src="perfect-lines.jpg"/> <img alt="faulty lines" src="faulty-lines.jpg"/></p>
-<p><img alt="slice-lines" src="slice-lines.jpg"/></p>
 <p>It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.</p>
+<p><img alt="slice-lines" src="slice-lines.jpg"/></p>
 <h2>Journey to the center of the Earth</h2>
 <p>So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.</p>
 <p><img alt="3icos" src="3icos-numbers.jpg"/></p>
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
-<p><img alt="ico-projection" src="ico-projection.jpg"/></p>
+<p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
 <p>The general implementation looks something like this:</p>
 <ul>
-<li>Draw a line from <code>p</code> to the origin (0, 0, 0) which is the center of our sphere</li>
+<li>
+Draw a line from <strong>P</strong> to the origin (0, 0, 0) which is the center of our sphere<ul>
 <li>Go over every triangle in the base mesh and verify whether our line intersects this triangle</li>
-<li>If it does, this intersection is our new point</li>
+<li>If it does, this intersection <strong>P'</strong> is our new point</li>
 <li>If not, continue looking</li>
+</ul>
+</li>
 </ul>
 <p>Now all our points live on this spherical approximation, consisting of triangles. We will continue for now with a low res icosahedron as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!</p>
 <h2>Connecting the dots</h2>
-<p>If we connect all our points again we'll see some countries look correct, and others don't.
-&lt;IMG: comparison&gt;</p>
-<p>Whenever all points lie on a single triangle there is no issue, but when they cross triangles we have the same problem as before where the line goes through the surface.
-We will need to split up our line <code>AB</code> into 2 lines: <code>AE</code> and <code>EB</code>, where <code>E</code> is a point on the edge <code>e</code> that the 2 triangles have in common.
-Sounds easy enough, but where does <code>E</code> lie exactly? In the middle of the edge or closer to one of its points?
-The exact position of <code>E</code> is defined in such a way that the sum both lines is as as small as possible, meaning <code>min(|AE| + |EB|)</code>.
+<p>Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.</p>
+<p><img alt="crossing-zoom" src="edge-crossing-zoom.jpg"/></p>
+<p>Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
+If we name these 2 "problematic" points <strong>A</strong> and <strong>B</strong>, then we want to transform line <strong>AB</strong> so that it follows the surface.
+In order to do that we just split up <strong>AB</strong> into 2 separate lines <strong>AE</strong> and <strong>EB</strong> where <strong>E</strong> is a point on the edge <strong>e</strong> that the 2 triangles have in common. This way <strong>AE</strong> lies completely on the same triangle <strong>A</strong> lives on, and the same goes for <strong>EB</strong> and <strong>B</strong>.</p>
+<p>Sounds easy enough, but where does <strong>E</strong> lie exactly? In the middle of the edge or closer to one of its points?
+The exact position of <strong>E</strong> is defined in such a way that the sum both lines is as as small as possible, meaning <strong>min(|AE| + |EB|)</strong>.
 There might be a cool formula for this, but I went with an iterative approach where:</p>
 <ul>
-<li>Divide <code>e</code> in 3 equally spaced points <code>X</code>, <code>Y</code>, <code>Z</code></li>
+<li>Divide <strong>e</strong> in 3 equally spaced points <strong>X</strong>, <strong>Y</strong>, <strong>Z</strong></li>
 <li>
-Calculate <code>|AX| + |XB|</code> and <code>|AZ| + |ZB|</code><ul>
-<li>If <code>X</code> gives the shorter path, make <code>e = eY</code> </li>
-<li>If <code>Z</code> gives the shorter path, make <code>e = Ye</code> </li>
+Calculate <strong>|AX| + |XB|</strong> and <strong>|AZ| + |ZB|</strong><ul>
+<li>If <strong>X</strong> gives the shorter path, make <strong>e = e<sub>1</sub>Y</strong> </li>
+<li>If <strong>Z</strong> gives the shorter path, make <strong>e = Ye<sub>2</sub></strong> </li>
 </ul>
 </li>
 <li>Repeat</li>
 </ul>
-<p>&lt;IMG: algorithm visually&gt; </p>
 <p>We can repeat this as many times as we like, I chose 15 as it seemed to give accurate enough results.</p>
+<video controls="">
+<source src="animations/connecting.webm" type="video/webm"/>
+</video>
 <h3>Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>

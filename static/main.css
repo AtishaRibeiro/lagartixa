@@ -64,6 +64,12 @@ img {
   max-width: clamp(5vw, 40rem, 90vw);
 }
 
+video {
+  mix-blend-mode: darken;
+  display: block;
+  margin: auto;
+}
+
 
 /* 2 images next to each other */
 
