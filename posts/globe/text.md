@@ -22,6 +22,8 @@ What to do in that case except come up with your own crazy convoluted solution?
 The approach I decided to go with was to turn the globe and all of the countries on it into separate 3D meshes.
 It became a small obsessions during the 2 months that I worked on this, to the point that I don't care if there are better methods.
 
+A fair warning, this is my first technical blog post, and a fairly abstract one at that. As such, in some parts I really struggled explaining what is going on exactly, apologies for that.
+
 ## Getting the data
 
 All country data was obtained from [Natural Earth](https://www.naturalearthdata.com/) which provides tons of geographical data.
@@ -170,11 +172,147 @@ The second caveat is that as we've seen before, countries can span various trian
 
 ### Redraw the borders
 
-<IMG: different examples>
+I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
+The end goal is to split the country up into 7 parts, that each lie completely on one the icosahedron's triangles.
 
+![uganda-sections](uganda-sections.jpg)
 
+In a first pass, we will collect all points per edge and sort them 
+
+```py
+def prepare_edges_and_corner_vertices(
+    vertices: list[np.ndarray], faces: list[int | EdgeI], mesh
+) -> dict[EdgeI, EdgeDictV]:
+    """
+    Create a mapping from edge (A,B) to a list of tuples (p, d).
+    * p = point on the edge
+    * d = distance to B
+    The list is sorted so that the point closest to B appears earlier in the list.
+    If A or B itself is also determined to be part of our eventual shape, it is
+    added to the list. For those, p will be the index in `mesh`, instead of `points`.
+    """
+    # Keep track of which face an edge point is coming from.
+    edge_points_face_dict: dict[int, int] = {}
+    # Keep track of which face an edge belongs to (we only keep 1 of the 2)
+    edge_face_dict: dict[EdgeI, int] = {}
+    # Per edge, keep a list of points on that edge sorted in order
+    # as they actually appear on the edge
+    edge_dict: dict[EdgeI, EdgeDictV] = {}
+    for i in range(len(vertices)):
+        f = faces[i]
+        v = vertices[i]
+        if isinstance(f, int):
+            continue
+
+        # We orient ourselves relative to the same face for each edge
+        if f not in edge_face_dict:
+            face = f.faces[0]  # type: ignore[index]
+            edge_face_dict[f] = face
+        else:
+            face = edge_face_dict[f]
+
+        ordered_e = mesh.get_ordered_edge(face, f)
+
+        # Calculate distance between edge point and left point of the edge
+        abs_dist = float(np.linalg.norm(v - mesh.vertices[ordered_e.p2]))
+        # Normalise
+        dist = abs_dist / float(
+            np.linalg.norm(mesh.vertices[ordered_e.p1] - mesh.vertices[ordered_e.p2])
+        )
+        if f not in edge_dict:
+            edge_dict[ordered_e] = EdgeDictV(ordered_e, i, dist)
+        else:
+            edge_dict[ordered_e].sorted_insert(VertexDistance(i, dist))
+
+        edge_points_face_dict[i] = ordered_e.faces[0]  # type: ignore[index]
+
+    # Add edge points (face corners) when they should be included
+    for edge, edge_points in edge_dict.items():
+        face = edge_face_dict[edge]
+
+        # The point closest to B must be going out of the face
+        if edge_points_face_dict[edge_points[0].vertex_i] == face:
+            edge_points.edge_vertices.insert(0, VertexDistance(edge.p2, 0))
+        # The point closest to A must be coming into the face
+        if edge_points_face_dict[edge_points[-1].vertex_i] != face:
+            edge_points.edge_vertices.append(VertexDistance(edge.p1, 1))
+
+    return edge_dict
+```
+
+This will give us the following dictionary (simplified here):
+```py
+{
+    (4, 8): [
+        (index=8, distance=0),
+        (index=4, distance=0.075)
+    ],
+    (1, 8): [        
+        (index=8,distance=0),
+        (index=17,distance=0.042),
+        (index=15,distance=0.046),
+        (index=13,distance=0.056),
+    ],
+    (10, 8): [
+        (index=8, distance=0),
+        (index=22, distance=0.037)
+    ],
+    (3, 8): [
+        (index=8, distance=0),
+        (index=29, distance=0.022)
+    ],
+    (5, 8): [
+        (index=8, distance=0),
+        (index=31, distance=0.034)
+    ],
+} 
+```
+
+To give a bit more detail on the last for loop; here we decide per edge whether a face vertex should be included as a part of our new shapes. By face vertices I mean vertices that make up the faces of the base shape: the icosahedron.
+We can already see that in this case vertex 8 should be included, as it's a vertex of 5 of our new shapes (all except the green one in our image).
+All the other face vertices of the edges we cross are not included (e.g. 4 and 1, they are off screen but we can see them in the dictionary).
+
+To decide which face vertices should be included we can make use of the fact that the country borders are all defined anti-clockwise. Imagine you're walking along the border in an anti-clockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
+If for example vertex 15 went straight back to vertex 4 and closed the country border that way, then the closest vertex left of 15 is 13, which is not a face vertex. As such 8 will never be included.
+
+![uganda-numbered](uganda-numbered.jpg)
+
+Using this dictionary, we can construct our new shapes. We go over our border in an anti-clockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
+The following pseudo-code describes how we will end up with our newly defined shapes:
+
+```py
+new_shapes = []
+new_shape = []
+edge_vertices = [...]
+for vertex in border:
+    if vertex == new_shape[0]:
+        new_shapes.append(new_shape)
+        if len(edge_vertices) == 0:
+            break
+        new_shape = []
+        vertex = edge_vertices[0]
+    new_shape.append(vertex)
+    if lies_on_edge(vertex):           
+        if not is_corner(vertex) and not is_leaving_face(vertex):
+            edge_vertices.remove(vertex)
+            continue
+        vertex = closest_vertex_left(vertex)
+```
+
+`closes_vertex_left()` will loop around the face. In our example that means we go from 17 > 8 > 4. 
 
 ### Chop up the pieces
 
+Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D. 
+We apply the algorithm, transform back into 3D and that's it!
+
+![uganda-triangles](uganda-triangles.jpg)
+
+Doing this for every single country means our project is complete! Though the wireframe does look very messy.
+
+![triangulated-earth](triangulated-earth.jpg)
+
 ## Conclusion
-## Gallery
+
+Phew, that was a journey. I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
+If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe).
