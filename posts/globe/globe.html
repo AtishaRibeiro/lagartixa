@@ -74,15 +74,13 @@ This means that any spherical mesh is just an approximation of the real thing. T
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
 <p>The general implementation looks something like this:</p>
-<ul>
-<li>
-Draw a line from <strong>P</strong> to the origin (0, 0, 0) which is the center of our sphere<ul>
-<li>Go over every triangle in the base mesh and verify whether our line intersects this triangle</li>
-<li>If it does, this intersection <strong>P'</strong> is our new point</li>
-<li>If not, continue looking</li>
-</ul>
-</li>
-</ul>
+<pre><code class="language-py">P = Point(p1, p2, p3)
+O = Point(0, 0, 0)
+for triangle in base_mesh:
+    P_prime: Point = intersection(triangle, P, O)
+    if P_prime is not None:
+        return P_prime
+</code></pre>
 <p>Now all our points live on this spherical approximation, consisting of triangles.</p>
 <p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
 <h2>Connecting the dots</h2>
@@ -93,32 +91,48 @@ If we name these 2 "problematic" points <strong>A</strong> and <strong>B</strong
 In order to do that we just split up <strong>AB</strong> into 2 separate lines <strong>AE</strong> and <strong>EB</strong> where <strong>E</strong> is a point on the edge <strong>e</strong> that the 2 triangles have in common. This way <strong>AE</strong> lies completely on the same triangle <strong>A</strong> lives on, and the same goes for <strong>EB</strong> and <strong>B</strong>.</p>
 <p>Sounds easy enough, but where does <strong>E</strong> lie exactly? In the middle of the edge or closer to one of its points?
 The exact position of <strong>E</strong> is defined in such a way that the sum both lines is as as small as possible, meaning <strong>min(|AE| + |EB|)</strong>.
-There might be a cool formula for this, but I went with an iterative approach where:</p>
-<ul>
-<li>Divide <strong>e</strong> in 3 equally spaced points <strong>X</strong>, <strong>Y</strong>, <strong>Z</strong></li>
-<li>
-Calculate <strong>|AX| + |XB|</strong> and <strong>|AZ| + |ZB|</strong><ul>
-<li>If <strong>X</strong> gives the shorter path, make <strong>e = e<sub>1</sub>Y</strong> </li>
-<li>If <strong>Z</strong> gives the shorter path, make <strong>e = Ye<sub>2</sub></strong> </li>
-</ul>
-</li>
-<li>Repeat</li>
-</ul>
-<p>We can repeat this as many times as we like, I chose 15 as it seemed to give accurate enough results.</p>
+There might be a cool formula for this, but I went with an iterative approach:</p>
+<pre><code class="language-py"># Find the edge between point A and B
+T1 = Triangle(A)
+T2 = Triangle(B)
+e = shared_edge(T1, T2)
+
+# Can be repeated as many times as we want, 15 gives accurate enough results
+for i in range(15):
+    # Get 3 equally spaced points on e 
+    X, Y, Z = subdivide(e, 4)
+    if distance(A, X) + distance(X, B) &lt; distance(A, Z) + distance(Z, B):
+        e = (X, Y)
+    else:
+        e = (Y, Z)
+
+return Y
+</code></pre>
 <video controls="">
 <source src="animations/connecting.webm" type="video/webm"/>
 </video>
 <h3>Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>
-<ul>
-<li>Put a point <strong>P</strong> in the middle of <strong>AB</strong></li>
-<li>Scale this point so it it lies outside of our sphere</li>
-<li>Draw a line from <strong>P</strong> to the origin</li>
-<li>Create a new point <strong>C</strong> at the intersection of this line with a triangle of our base</li>
-<li>Replace <strong>AB</strong> with 2 lines: <strong>AC</strong> and <strong>CB</strong></li>
-</ul>
-<p>We repeat this as many times as necessary until neighbouring points lie on neighbouring triangles, so we can apply algorithm one.</p>
+<pre><code class="language-py">def connect_2_points(A, B):
+    if on_neighbouring_triangles(A, B):
+        return
+
+    # Get a point in the middle of A and B
+    P = subdivide(A, B, 2)
+    # Scale P so it lies outside of our sphere
+    P *= 2
+
+    O = Point(0, 0, 0)
+    for triangle in base_mesh:
+        C: Point = intersection(triangle, P, O)
+        if C is not None:
+            add_point_to_mesh(C)
+            connect_2_points(A, C)
+            connect_2_points(C, B)
+            break
+</code></pre>
+<p>Once all points are on neighbouring triangles we can apply algorithm one again.</p>
 <video controls="">
 <source src="animations/cross-connecting.webm" type="video/webm"/>
 </video>
@@ -261,6 +275,10 @@ We apply the algorithm, transform back into 3D and that's it!</p>
 <p>Doing this for every single country means our project is complete! Though the wireframe does look very messy.</p>
 <p><img alt="triangulated-earth" src="triangulated-earth.jpg"/></p>
 <h2>Conclusion</h2>
-<h2>Gallery</h2>
+<p>Phew, that was a journey.</p>
+<p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.
+If you're interested, all code is available on <a href="https://github.com/AtishaRibeiro/globe">the github page</a>.</p>
+<p>Enjoy this final result, I think it looks pretty good:
+TODO</p>
 </body>
 </html>

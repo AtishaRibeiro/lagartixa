@@ -97,10 +97,14 @@ In order to connect our points with straight lines that seemingly lie on a spher
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.
 
 The general implementation looks something like this:
-* Draw a line from **P** to the origin (0, 0, 0) which is the center of our sphere
-    * Go over every triangle in the base mesh and verify whether our line intersects this triangle
-    * If it does, this intersection **P'** is our new point
-    * If not, continue looking
+```py
+P = Point(p1, p2, p3)
+O = Point(0, 0, 0)
+for triangle in base_mesh:
+    P_prime: Point = intersection(triangle, P, O)
+    if P_prime is not None:
+        return P_prime
+```
 
 Now all our points live on this spherical approximation, consisting of triangles.
 
@@ -119,14 +123,24 @@ In order to do that we just split up **AB** into 2 separate lines **AE** and **E
 
 Sounds easy enough, but where does **E** lie exactly? In the middle of the edge or closer to one of its points?
 The exact position of **E** is defined in such a way that the sum both lines is as as small as possible, meaning **min(|AE| + |EB|)**.
-There might be a cool formula for this, but I went with an iterative approach where:
-* Divide **e** in 3 equally spaced points **X**, **Y**, **Z**
-* Calculate **|AX| + |XB|** and **|AZ| + |ZB|**
-  * If **X** gives the shorter path, make **e = e<sub>1</sub>Y** 
-  * If **Z** gives the shorter path, make **e = Ye<sub>2</sub>** 
-* Repeat
+There might be a cool formula for this, but I went with an iterative approach:
+```py
+# Find the edge between point A and B
+T1 = Triangle(A)
+T2 = Triangle(B)
+e = shared_edge(T1, T2)
 
-We can repeat this as many times as we like, I chose 15 as it seemed to give accurate enough results.
+# Can be repeated as many times as we want, 15 gives accurate enough results
+for i in range(15):
+    # Get 3 equally spaced points on e 
+    X, Y, Z = subdivide(e, 4)
+    if distance(A, X) + distance(X, B) < distance(A, Z) + distance(Z, B):
+        e = (X, Y)
+    else:
+        e = (Y, Z)
+
+return Y
+```
 
 <video controls>
     <source src="animations/connecting.webm" type="video/webm"/>
@@ -138,13 +152,27 @@ We can repeat this as many times as we like, I chose 15 as it seemed to give acc
 Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:
 
-* Put a point **P** in the middle of **AB**
-* Scale this point so it it lies outside of our sphere
-* Draw a line from **P** to the origin
-* Create a new point **C** at the intersection of this line with a triangle of our base
-* Replace **AB** with 2 lines: **AC** and **CB**
+```py
+def connect_2_points(A, B):
+    if on_neighbouring_triangles(A, B):
+        return
 
-We repeat this as many times as necessary until neighbouring points lie on neighbouring triangles, so we can apply algorithm one.
+    # Get a point in the middle of A and B
+    P = subdivide(A, B, 2)
+    # Scale P so it lies outside of our sphere
+    P *= 2
+
+    O = Point(0, 0, 0)
+    for triangle in base_mesh:
+        C: Point = intersection(triangle, P, O)
+        if C is not None:
+            add_point_to_mesh(C)
+            connect_2_points(A, C)
+            connect_2_points(C, B)
+            break
+```
+
+Once all points are on neighbouring triangles we can apply algorithm one again.
 
 <video controls>
     <source src="animations/cross-connecting.webm" type="video/webm"/>
@@ -314,5 +342,10 @@ Doing this for every single country means our project is complete! Though the wi
 
 ## Conclusion
 
-Phew, that was a journey. I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
+Phew, that was a journey.
+
+I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
 If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe).
+
+Enjoy this final result, I think it looks pretty good:
+TODO
