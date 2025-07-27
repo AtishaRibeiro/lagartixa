@@ -1,7 +1,7 @@
 
 <html>
 <head><link href="../../static/main.css" rel="stylesheet"/></head>
-<body><img alt="beautiful site logo" id="site-logo" src="../../static/base_logo.png"/><h1>Turning the globe into a 3D mesh</h1>
+<body><img alt="beautiful site logo" id="site-logo" src="../../static/base_logo.png"/><h1 id="turning-the-globe-into-a-3d-mesh">Turning the globe into a 3D mesh</h1>
 <p>I was working on a video where I wanted to visualise various locations across the former Soviet Union.
 The requirements were pretty straightforward:</p>
 <ul>
@@ -22,51 +22,55 @@ What to do in that case except come up with your own crazy convoluted solution?<
 <p>The approach I decided to go with was to turn the globe and all of the countries on it into separate 3D meshes.
 It became a small obsessions during the 2 months that I worked on this, to the point that I don't care if there are better methods.</p>
 <p>A fair warning, this is my first technical blog post, and a fairly abstract one at that. As such, in some parts I really struggled explaining what is going on exactly, apologies for that.</p>
-<h2>Getting the data</h2>
+<h2 id="getting-the-data">Getting the data</h2>
 <p>All country data was obtained from <a href="https://www.naturalearthdata.com/">Natural Earth</a> which provides tons of geographical data.
 This includes the country and region borders that we need.</p>
-<p>The data comes in the form of <a href="https://en.wikipedia.org/wiki/Shapefile">.shp files</a>, which we can interpet using <code>geopandas</code>.</p>
+<p>The data comes in the form of <a href="https://en.wikipedia.org/wiki/Shapefile">.shp files</a>, which we can interpet using <code><div class="highlight"><pre><span></span><span class="n">geopandas</span>
+</pre></div>
+</code>.</p>
 <p>EX: Reading Luxembourg's border from the 1:50M country border dataset:</p>
-<pre><code class="language-py">import geopandas as gpd
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
-data = gpd.read_file("ne_50m_admin_0_countries.shp")
-geo_data = data.loc[data["SOVEREIGNT"] == "Luxembourg"]["geometry"]
-# List of list since  countries can consist of multiple borders: main land, islands, enclaves, ...
-luxembourg: list[list[tuple]] = []
-if isinstance(geo_data, shapely.MultiPolygon):
-    for geom in geo_data.geoms:
-        luxembourg.append(geom.exterior.coords)
-else:
-    luxembourg.append(geo_data.exterior.coords)
+<span class="n">data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">"ne_50m_admin_0_countries.shp"</span><span class="p">)</span>
+<span class="n">geo_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">"SOVEREIGNT"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Luxembourg"</span><span class="p">][</span><span class="s2">"geometry"</span><span class="p">]</span>
+<span class="c1"># List of list since  countries can consist of multiple borders: main land, islands, enclaves, ...</span>
+<span class="n">luxembourg</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">list</span><span class="p">[</span><span class="nb">tuple</span><span class="p">]]</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">geo_data</span><span class="p">,</span> <span class="n">shapely</span><span class="o">.</span><span class="n">MultiPolygon</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">geom</span> <span class="ow">in</span> <span class="n">geo_data</span><span class="o">.</span><span class="n">geoms</span><span class="p">:</span>
+        <span class="n">luxembourg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geom</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+<span class="k">else</span><span class="p">:</span>
+    <span class="n">luxembourg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geo_data</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
+</pre></div>
 </code></pre>
 <p>The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).</p>
 <p><img alt="luxembourg outline" src="luxembourg.png" title="TESTING TITLE"/></p>
 <p>In Natural Earth's dataset all borders/shapes are described in a clock-wise order, which is something that will come in handy later on!</p>
-<h2>Placing coordinates in 3D space</h2>
+<h2 id="placing-coordinates-in-3d-space">Placing coordinates in 3D space</h2>
 <p>Coordinates describe points on a sphere, but we want points in 3D.
 The following function transforms a coordinate into a point in 3D space on a sphere of radius 1.</p>
-<pre><code class="language-py">def coord_on_sphere(x, y) -&gt; np.ndarray:
-    """Translate (lon,lat) point to a point on a 3D sphere"""
-    radian_ratio = math.pi / 180
-    x1 = math.cos(y * radian_ratio)
-    y1 = 0
-    z1 = math.sin(y * radian_ratio)
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">coord_on_sphere</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<span class="w">    </span><span class="sd">"""Translate (lon,lat) point to a point on a 3D sphere"""</span>
+    <span class="n">radian_ratio</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
+    <span class="n">x1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">radian_ratio</span><span class="p">)</span>
+    <span class="n">y1</span> <span class="o">=</span> <span class="mi">0</span>
+    <span class="n">z1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">radian_ratio</span><span class="p">)</span>
 
-    # rotate around z axis
-    cos_theta = math.cos(x * radian_ratio)
-    sin_theta = math.sin(x * radian_ratio)
-    x2 = cos_theta * x1
-    y2 = sin_theta * x1
+    <span class="c1"># rotate around z axis</span>
+    <span class="n">cos_theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">radian_ratio</span><span class="p">)</span>
+    <span class="n">sin_theta</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">sin</span><span class="p">(</span><span class="n">x</span> <span class="o">*</span> <span class="n">radian_ratio</span><span class="p">)</span>
+    <span class="n">x2</span> <span class="o">=</span> <span class="n">cos_theta</span> <span class="o">*</span> <span class="n">x1</span>
+    <span class="n">y2</span> <span class="o">=</span> <span class="n">sin_theta</span> <span class="o">*</span> <span class="n">x1</span>
 
-    return np.array((x2, y2, z1))
+    <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">))</span>
+</pre></div>
 </code></pre>
 <p>If we then write all of these 3D points to an <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">.OBJ</a> file and connect them using <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements">lines</a> we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.</p>
 <p><img alt="perfect lines" src="perfect-lines.jpg"/> <img alt="faulty lines" src="faulty-lines.jpg"/></p>
 <p>It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.</p>
 <p><img alt="slice-lines" src="slice-lines.jpg"/></p>
-<h2>Journey to the center of the Earth</h2>
+<h2 id="journey-to-the-center-of-the-earth">Journey to the center of the Earth</h2>
 <p>So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.</p>
 <p><img alt="3icos" src="3icos-numbers.jpg"/></p>
@@ -74,16 +78,17 @@ This means that any spherical mesh is just an approximation of the real thing. T
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
 <p>The general implementation looks something like this:</p>
-<pre><code class="language-py">P = Point(p1, p2, p3)
-O = Point(0, 0, 0)
-for triangle in base_mesh:
-    P_prime: Point = intersection(triangle, P, O)
-    if P_prime is not None:
-        return P_prime
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span>
+<span class="n">O</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+<span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">base_mesh</span><span class="p">:</span>
+    <span class="n">P_prime</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="n">intersection</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">O</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">P_prime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">return</span> <span class="n">P_prime</span>
+</pre></div>
 </code></pre>
 <p>Now all our points live on this spherical approximation, consisting of triangles.</p>
 <p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
-<h2>Connecting the dots</h2>
+<h2 id="connecting-the-dots">Connecting the dots</h2>
 <p>Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.</p>
 <p><img alt="crossing-zoom" src="edge-crossing-zoom-bad.jpg"/></p>
 <p>Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
@@ -92,45 +97,47 @@ In order to do that we just split up <strong>AB</strong> into 2 separate lines <
 <p>Sounds easy enough, but where does <strong>E</strong> lie exactly? In the middle of the edge or closer to one of its points?
 The exact position of <strong>E</strong> is defined in such a way that the sum both lines is as as small as possible, meaning <strong>min(|AE| + |EB|)</strong>.
 There might be a cool formula for this, but I went with an iterative approach:</p>
-<pre><code class="language-py"># Find the edge between point A and B
-T1 = Triangle(A)
-T2 = Triangle(B)
-e = shared_edge(T1, T2)
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="c1"># Find the edge between point A and B</span>
+<span class="n">T1</span> <span class="o">=</span> <span class="n">Triangle</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
+<span class="n">T2</span> <span class="o">=</span> <span class="n">Triangle</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
+<span class="n">e</span> <span class="o">=</span> <span class="n">shared_edge</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="n">T2</span><span class="p">)</span>
 
-# Can be repeated as many times as we want, 15 gives accurate enough results
-for i in range(15):
-    # Get 3 equally spaced points on e 
-    X, Y, Z = subdivide(e, 4)
-    if distance(A, X) + distance(X, B) &lt; distance(A, Z) + distance(Z, B):
-        e = (X, Y)
-    else:
-        e = (Y, Z)
+<span class="c1"># Can be repeated as many times as we want, 15 gives accurate enough results</span>
+<span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="mi">15</span><span class="p">):</span>
+    <span class="c1"># Get 3 equally spaced points on e </span>
+    <span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">,</span> <span class="n">Z</span> <span class="o">=</span> <span class="n">subdivide</span><span class="p">(</span><span class="n">e</span><span class="p">,</span> <span class="mi">4</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">distance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">X</span><span class="p">)</span> <span class="o">+</span> <span class="n">distance</span><span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span> <span class="o">&lt;</span> <span class="n">distance</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span> <span class="o">+</span> <span class="n">distance</span><span class="p">(</span><span class="n">Z</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">X</span><span class="p">,</span> <span class="n">Y</span><span class="p">)</span>
+    <span class="k">else</span><span class="p">:</span>
+        <span class="n">e</span> <span class="o">=</span> <span class="p">(</span><span class="n">Y</span><span class="p">,</span> <span class="n">Z</span><span class="p">)</span>
 
-return Y
+<span class="k">return</span> <span class="n">Y</span>
+</pre></div>
 </code></pre>
 <video controls="">
 <source src="animations/connecting.webm" type="video/webm"/>
 </video>
-<h3>Crossing multiple triangles</h3>
+<h3 id="crossing-multiple-triangles">Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>
-<pre><code class="language-py">def connect_2_points(A, B):
-    if on_neighbouring_triangles(A, B):
-        return
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">connect_2_points</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+    <span class="k">if</span> <span class="n">on_neighbouring_triangles</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+        <span class="k">return</span>
 
-    # Get a point in the middle of A and B
-    P = subdivide(A, B, 2)
-    # Scale P so it lies outside of our sphere
-    P *= 2
+    <span class="c1"># Get a point in the middle of A and B</span>
+    <span class="n">P</span> <span class="o">=</span> <span class="n">subdivide</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">,</span> <span class="mi">2</span><span class="p">)</span>
+    <span class="c1"># Scale P so it lies outside of our sphere</span>
+    <span class="n">P</span> <span class="o">*=</span> <span class="mi">2</span>
 
-    O = Point(0, 0, 0)
-    for triangle in base_mesh:
-        C: Point = intersection(triangle, P, O)
-        if C is not None:
-            add_point_to_mesh(C)
-            connect_2_points(A, C)
-            connect_2_points(C, B)
-            break
+    <span class="n">O</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
+    <span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">base_mesh</span><span class="p">:</span>
+        <span class="n">C</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="n">intersection</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">O</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">C</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="n">add_point_to_mesh</span><span class="p">(</span><span class="n">C</span><span class="p">)</span>
+            <span class="n">connect_2_points</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">C</span><span class="p">)</span>
+            <span class="n">connect_2_points</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
+            <span class="k">break</span>
+</pre></div>
 </code></pre>
 <p>Once all points are on neighbouring triangles we can apply algorithm one again.</p>
 <video controls="">
@@ -145,102 +152,104 @@ To decide what triangles lie in the middle we do the following:</p>
 <p>But since these are just outlines, we can't actually colour in the countries. What we need is a surface to draw on; aka a mesh.
 If I had known what work was ahead of me at this point, I would have compromised and stopped here.
 But I didn't so let's continue!</p>
-<h2>Nation triangulation</h2>
+<h2 id="nation-triangulation">Nation triangulation</h2>
 <p>Up until now we've only created outlines of countries, but meshes consist of triangles, not lines.
 Luckily there already exist some triangulation algorithms that are not that hard to implement, like the <a href="https://nils-olovsson.se/articles/ear_clipping_triangulation/">ear clipping algorithm</a>.
 This will allow us to divide our shapes (countries) into individual triangles that describe our mesh.</p>
 <p>Although the algorithm is very simple, there are 2 caveats that complicate things. To start with, the algorithm works in 2D but we are operating in 3D.
 Since all our points lie on triangles, all points that share a triangle lie on the same plane and as such we can treat them as if they live in 2D space.
 The second caveat is that as we've seen before, countries can span various triangles, so we will need a way to split up our country into pieces so each piece lies on a single triangle.</p>
-<h3>Redraw the borders</h3>
+<h3 id="redraw-the-borders">Redraw the borders</h3>
 <p>I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
 The end goal is to split the country up into 7 parts, that each lie completely on one the icosahedron's triangles.</p>
 <p><img alt="uganda-sections" src="uganda-sections.jpg"/></p>
 <p>In a first pass, we will collect all points per edge and sort them </p>
-<pre><code class="language-py">def prepare_edges_and_corner_vertices(
-    vertices: list[np.ndarray], faces: list[int | EdgeI], mesh
-) -&gt; dict[EdgeI, EdgeDictV]:
-    """
-    Create a mapping from edge (A,B) to a list of tuples (p, d).
-    * p = point on the edge
-    * d = distance to B
-    The list is sorted so that the point closest to B appears earlier in the list.
-    If A or B itself is also determined to be part of our eventual shape, it is
-    added to the list. For those, p will be the index in `mesh`, instead of `points`.
-    """
-    # Keep track of which face an edge point is coming from.
-    edge_points_face_dict: dict[int, int] = {}
-    # Keep track of which face an edge belongs to (we only keep 1 of the 2)
-    edge_face_dict: dict[EdgeI, int] = {}
-    # Per edge, keep a list of points on that edge sorted in order
-    # as they actually appear on the edge
-    edge_dict: dict[EdgeI, EdgeDictV] = {}
-    for i in range(len(vertices)):
-        f = faces[i]
-        v = vertices[i]
-        if isinstance(f, int):
-            continue
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">prepare_edges_and_corner_vertices</span><span class="p">(</span>
+    <span class="n">vertices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">faces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="n">EdgeI</span><span class="p">],</span> <span class="n">mesh</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EdgeI</span><span class="p">,</span> <span class="n">EdgeDictV</span><span class="p">]:</span>
+<span class="w">    </span><span class="sd">"""</span>
+<span class="sd">    Create a mapping from edge (A,B) to a list of tuples (p, d).</span>
+<span class="sd">    * p = point on the edge</span>
+<span class="sd">    * d = distance to B</span>
+<span class="sd">    The list is sorted so that the point closest to B appears earlier in the list.</span>
+<span class="sd">    If A or B itself is also determined to be part of our eventual shape, it is</span>
+<span class="sd">    added to the list. For those, p will be the index in `mesh`, instead of `points`.</span>
+<span class="sd">    """</span>
+    <span class="c1"># Keep track of which face an edge point is coming from.</span>
+    <span class="n">edge_points_face_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="nb">int</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Keep track of which face an edge belongs to (we only keep 1 of the 2)</span>
+    <span class="n">edge_face_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EdgeI</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="c1"># Per edge, keep a list of points on that edge sorted in order</span>
+    <span class="c1"># as they actually appear on the edge</span>
+    <span class="n">edge_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EdgeI</span><span class="p">,</span> <span class="n">EdgeDictV</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="nb">range</span><span class="p">(</span><span class="nb">len</span><span class="p">(</span><span class="n">vertices</span><span class="p">)):</span>
+        <span class="n">f</span> <span class="o">=</span> <span class="n">faces</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="n">v</span> <span class="o">=</span> <span class="n">vertices</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+        <span class="k">if</span> <span class="nb">isinstance</span><span class="p">(</span><span class="n">f</span><span class="p">,</span> <span class="nb">int</span><span class="p">):</span>
+            <span class="k">continue</span>
 
-        # We orient ourselves relative to the same face for each edge
-        if f not in edge_face_dict:
-            face = f.faces[0]  # type: ignore[index]
-            edge_face_dict[f] = face
-        else:
-            face = edge_face_dict[f]
+        <span class="c1"># We orient ourselves relative to the same face for each edge</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge_face_dict</span><span class="p">:</span>
+            <span class="n">face</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># type: ignore[index]</span>
+            <span class="n">edge_face_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">face</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">face</span> <span class="o">=</span> <span class="n">edge_face_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
 
-        ordered_e = mesh.get_ordered_edge(face, f)
+        <span class="n">ordered_e</span> <span class="o">=</span> <span class="n">mesh</span><span class="o">.</span><span class="n">get_ordered_edge</span><span class="p">(</span><span class="n">face</span><span class="p">,</span> <span class="n">f</span><span class="p">)</span>
 
-        # Calculate distance between edge point and left point of the edge
-        abs_dist = float(np.linalg.norm(v - mesh.vertices[ordered_e.p2]))
-        # Normalise
-        dist = abs_dist / float(
-            np.linalg.norm(mesh.vertices[ordered_e.p1] - mesh.vertices[ordered_e.p2])
-        )
-        if f not in edge_dict:
-            edge_dict[ordered_e] = EdgeDictV(ordered_e, i, dist)
-        else:
-            edge_dict[ordered_e].sorted_insert(VertexDistance(i, dist))
+        <span class="c1"># Calculate distance between edge point and left point of the edge</span>
+        <span class="n">abs_dist</span> <span class="o">=</span> <span class="nb">float</span><span class="p">(</span><span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">v</span> <span class="o">-</span> <span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">ordered_e</span><span class="o">.</span><span class="n">p2</span><span class="p">]))</span>
+        <span class="c1"># Normalise</span>
+        <span class="n">dist</span> <span class="o">=</span> <span class="n">abs_dist</span> <span class="o">/</span> <span class="nb">float</span><span class="p">(</span>
+            <span class="n">np</span><span class="o">.</span><span class="n">linalg</span><span class="o">.</span><span class="n">norm</span><span class="p">(</span><span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">ordered_e</span><span class="o">.</span><span class="n">p1</span><span class="p">]</span> <span class="o">-</span> <span class="n">mesh</span><span class="o">.</span><span class="n">vertices</span><span class="p">[</span><span class="n">ordered_e</span><span class="o">.</span><span class="n">p2</span><span class="p">])</span>
+        <span class="p">)</span>
+        <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge_dict</span><span class="p">:</span>
+            <span class="n">edge_dict</span><span class="p">[</span><span class="n">ordered_e</span><span class="p">]</span> <span class="o">=</span> <span class="n">EdgeDictV</span><span class="p">(</span><span class="n">ordered_e</span><span class="p">,</span> <span class="n">i</span><span class="p">,</span> <span class="n">dist</span><span class="p">)</span>
+        <span class="k">else</span><span class="p">:</span>
+            <span class="n">edge_dict</span><span class="p">[</span><span class="n">ordered_e</span><span class="p">]</span><span class="o">.</span><span class="n">sorted_insert</span><span class="p">(</span><span class="n">VertexDistance</span><span class="p">(</span><span class="n">i</span><span class="p">,</span> <span class="n">dist</span><span class="p">))</span>
 
-        edge_points_face_dict[i] = ordered_e.faces[0]  # type: ignore[index]
+        <span class="n">edge_points_face_dict</span><span class="p">[</span><span class="n">i</span><span class="p">]</span> <span class="o">=</span> <span class="n">ordered_e</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>  <span class="c1"># type: ignore[index]</span>
 
-    # Add edge points (face corners) when they should be included
-    for edge, edge_points in edge_dict.items():
-        face = edge_face_dict[edge]
+    <span class="c1"># Add edge points (face corners) when they should be included</span>
+    <span class="k">for</span> <span class="n">edge</span><span class="p">,</span> <span class="n">edge_points</span> <span class="ow">in</span> <span class="n">edge_dict</span><span class="o">.</span><span class="n">items</span><span class="p">():</span>
+        <span class="n">face</span> <span class="o">=</span> <span class="n">edge_face_dict</span><span class="p">[</span><span class="n">edge</span><span class="p">]</span>
 
-        # The point closest to B must be going out of the face
-        if edge_points_face_dict[edge_points[0].vertex_i] == face:
-            edge_points.edge_vertices.insert(0, VertexDistance(edge.p2, 0))
-        # The point closest to A must be coming into the face
-        if edge_points_face_dict[edge_points[-1].vertex_i] != face:
-            edge_points.edge_vertices.append(VertexDistance(edge.p1, 1))
+        <span class="c1"># The point closest to B must be going out of the face</span>
+        <span class="k">if</span> <span class="n">edge_points_face_dict</span><span class="p">[</span><span class="n">edge_points</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_i</span><span class="p">]</span> <span class="o">==</span> <span class="n">face</span><span class="p">:</span>
+            <span class="n">edge_points</span><span class="o">.</span><span class="n">edge_vertices</span><span class="o">.</span><span class="n">insert</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="n">VertexDistance</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">p2</span><span class="p">,</span> <span class="mi">0</span><span class="p">))</span>
+        <span class="c1"># The point closest to A must be coming into the face</span>
+        <span class="k">if</span> <span class="n">edge_points_face_dict</span><span class="p">[</span><span class="n">edge_points</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]</span><span class="o">.</span><span class="n">vertex_i</span><span class="p">]</span> <span class="o">!=</span> <span class="n">face</span><span class="p">:</span>
+            <span class="n">edge_points</span><span class="o">.</span><span class="n">edge_vertices</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">VertexDistance</span><span class="p">(</span><span class="n">edge</span><span class="o">.</span><span class="n">p1</span><span class="p">,</span> <span class="mi">1</span><span class="p">))</span>
 
-    return edge_dict
+    <span class="k">return</span> <span class="n">edge_dict</span>
+</pre></div>
 </code></pre>
 <p>This will give us the following dictionary (simplified here):</p>
-<pre><code class="language-py">{
-    (4, 8): [
-        (index=8, distance=0),
-        (index=4, distance=0.075)
-    ],
-    (1, 8): [        
-        (index=8,distance=0),
-        (index=17,distance=0.042),
-        (index=15,distance=0.046),
-        (index=13,distance=0.056),
-    ],
-    (10, 8): [
-        (index=8, distance=0),
-        (index=22, distance=0.037)
-    ],
-    (3, 8): [
-        (index=8, distance=0),
-        (index=29, distance=0.022)
-    ],
-    (5, 8): [
-        (index=8, distance=0),
-        (index=31, distance=0.034)
-    ],
-} 
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="p">{</span>
+    <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.075</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>        
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span><span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">17</span><span class="p">,</span><span class="n">distance</span><span class="o">=</span><span class="mf">0.042</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">15</span><span class="p">,</span><span class="n">distance</span><span class="o">=</span><span class="mf">0.046</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">13</span><span class="p">,</span><span class="n">distance</span><span class="o">=</span><span class="mf">0.056</span><span class="p">),</span>
+    <span class="p">],</span>
+    <span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">22</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.037</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="p">(</span><span class="mi">3</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">29</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.022</span><span class="p">)</span>
+    <span class="p">],</span>
+    <span class="p">(</span><span class="mi">5</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
+        <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">31</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.034</span><span class="p">)</span>
+    <span class="p">],</span>
+<span class="p">}</span> 
+</pre></div>
 </code></pre>
 <p>To give a bit more detail on the last for loop; here we decide per edge whether a face vertex should be included as a part of our new shapes. By face vertices I mean vertices that make up the faces of the base shape: the icosahedron.
 We can already see that in this case vertex 8 should be included, as it's a vertex of 5 of our new shapes (all except the green one in our image).
@@ -250,31 +259,34 @@ If for example vertex 15 went straight back to vertex 4 and closed the country b
 <p><img alt="uganda-numbered" src="uganda-numbered.jpg"/></p>
 <p>Using this dictionary, we can construct our new shapes. We go over our border in an anti-clockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
 The following pseudo-code describes how we will end up with our newly defined shapes:</p>
-<pre><code class="language-py">new_shapes = []
-new_shape = []
-edge_vertices = [...]
-for vertex in border:
-    if vertex == new_shape[0]:
-        new_shapes.append(new_shape)
-        if len(edge_vertices) == 0:
-            break
-        new_shape = []
-        vertex = edge_vertices[0]
-    new_shape.append(vertex)
-    if lies_on_edge(vertex):           
-        if not is_corner(vertex) and not is_leaving_face(vertex):
-            edge_vertices.remove(vertex)
-            continue
-        vertex = closest_vertex_left(vertex)
+<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="n">new_shapes</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">new_shape</span> <span class="o">=</span> <span class="p">[]</span>
+<span class="n">edge_vertices</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
+<span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">border</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">vertex</span> <span class="o">==</span> <span class="n">new_shape</span><span class="p">[</span><span class="mi">0</span><span class="p">]:</span>
+        <span class="n">new_shapes</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_shape</span><span class="p">)</span>
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">edge_vertices</span><span class="p">)</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>
+            <span class="k">break</span>
+        <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">edge_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+    <span class="n">new_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+    <span class="k">if</span> <span class="n">lies_on_edge</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>           
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">is_corner</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_leaving_face</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
+            <span class="n">edge_vertices</span><span class="o">.</span><span class="n">remove</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+            <span class="k">continue</span>
+        <span class="n">vertex</span> <span class="o">=</span> <span class="n">closest_vertex_left</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
+</pre></div>
 </code></pre>
-<p><code>closes_vertex_left()</code> will loop around the face. In our example that means we go from 17 &gt; 8 &gt; 4. </p>
-<h3>Chop up the pieces</h3>
+<p><code><div class="highlight"><pre><span></span><span class="n">closes_vertex_left</span><span class="p">()</span>
+</pre></div>
+</code> will loop around the face. In our example that means we go from 17 &gt; 8 &gt; 4. </p>
+<h3 id="chop-up-the-pieces">Chop up the pieces</h3>
 <p>Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D.
 We apply the algorithm, transform back into 3D and that's it!</p>
 <p><img alt="uganda-triangles" src="uganda-triangles.jpg"/></p>
 <p>Doing this for every single country means our project is complete! Though the wireframe does look very messy.</p>
 <p><img alt="triangulated-earth" src="triangulated-earth.jpg"/></p>
-<h2>Conclusion</h2>
+<h2 id="conclusion">Conclusion</h2>
 <p>Phew, that was a journey.</p>
 <p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.
 If you're interested, all code is available on <a href="https://github.com/AtishaRibeiro/globe">the github page</a>.</p>

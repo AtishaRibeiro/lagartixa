@@ -7,4 +7,5 @@ requires-python = ">=3.13"
 dependencies = [
     "beautifulsoup4>=4.13.3",
     "marko>=2.1.2",
+    "pygments>=2.19.2",
 ]

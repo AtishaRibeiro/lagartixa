@@ -41,21 +41,11 @@ h2 {
 
 pre {
   color: #515151;
-  background: #F2F0DC;
+  background: #DCF2E5;
   padding: 10px;
   border-radius: 7px;
 }
 
-code {
-  font-size: 12;
-}
-
-code:not(pre *) {
-  color: #515151;
-  background: #F2F0DC;
-  padding: 3px;
-  border-radius: 4px;
-}
 
 img {
   mix-blend-mode: darken;
@@ -79,4 +69,21 @@ p:has(> img:nth-child(2)) {
 
 p:has(> img:nth-child(2))>img {
   max-width: clamp(5vw, 24rem, 90vw);
+}
+
+/* Everything code related */
+
+code {
+  font-size: 12;
+}
+
+code:not(pre *) {
+  color: #515151;
+  background: #DCF2E5;
+  padding: 3px;
+  border-radius: 4px;
+}
+
+.nf {
+  color: #00007F;
 }
