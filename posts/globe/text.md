@@ -77,7 +77,7 @@ def coord_on_sphere(x, y) -> np.ndarray:
 
 If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.
 
-![perfect lines](perfect-lines.jpg) ![faulty lines](faulty-lines.jpg)
+![perfect lines](perfect-lines.jpg) ![faulty lines](faulty-lines.jpg "test")
 
 It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.

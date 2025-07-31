@@ -1,4 +1,4 @@
-from bs4 import BeautifulSoup, Tag
+from bs4 import BeautifulSoup
 from marko import Parser, Renderer, convert
 import os
 from pygments import highlight
@@ -24,6 +24,60 @@ def get_relative_dir_offset(dir: str) -> str:
     return "/".join([".."] * nr_dirs)
 
 
+def anchor_headers(soup: BeautifulSoup):
+    # Create id's for headers so they can be anchored
+    headers = soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
+    for header in headers:
+        text = header.get_text()
+        text = text.lower()
+        text = text.replace(" ", "-")
+        header["id"] = text
+
+
+def syntax_highlighting(soup: BeautifulSoup):
+    # Apply code syntax highlighting
+    code_blocks = soup.find_all("code")
+    for block in code_blocks:
+        highlighted = highlight(block.get_text(), PythonLexer(), HtmlFormatter())
+        parsed = BeautifulSoup(highlighted, "html.parser")
+        block.string = ""
+
+        # Extract code if it's inside of a <pre>
+        parent = block.parent
+        if parent.name == "pre":
+            parent.insert_after(block.extract())
+            if not parent.text.strip():
+                # Delete empty <pre>
+                parent.decompose()
+
+        block.append(parsed)
+
+
+def image_titles(soup: BeautifulSoup):
+    img_counter = 1
+
+    for img in soup.find_all("img"):
+        if img.get("id") == "site-logo":
+            continue
+
+        # Wrap img in a div
+        div = soup.new_tag("div", attrs={"class": "img-div"})
+        img.parent.insert(img.parent.contents.index(img), div)
+        div.append(img)
+
+        # Change parent <p> to a <div>
+        div.parent.name = "div"
+        div.parent["class"] = "img-root"
+
+        title = img.get("title")
+        title = f"Figure {img_counter}{f": {title}" if title else ""}"
+
+        title = soup.new_tag("p", string=title, attrs={"class": "img-title"})
+        img.insert_after(title)
+
+        img_counter += 1
+
+
 def process_html(html: str, dir: str, pretty: bool = False) -> None:
     soup: BeatifulSoup = BeautifulSoup(html, "html.parser")
     rel_dir = get_relative_dir_offset(dir)
@@ -41,26 +95,9 @@ def process_html(html: str, dir: str, pretty: bool = False) -> None:
     new_soup.body.append(header)
     new_soup.body.append(soup)
 
-    # Create id's for headers so they can be anchored
-    headers = new_soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
-    for header in headers:
-        text = header.get_text()
-        text = text.lower()
-        text = text.replace(" ", "-")
-        header["id"] = text
-
-    # Apply code syntax highlighting
-    code_blocks = new_soup.find_all("code")
-    for block in code_blocks:
-        highlighted = highlight(block.get_text(), PythonLexer(), HtmlFormatter())
-        parsed = BeautifulSoup(highlighted, "html.parser")
-        block.string = ""
-        # inner_pre_contents = parsed.find("pre").decode_contents()
-        # print(inner_pre_contents)
-        # pre_soup = BeautifulSoup(inner_pre_contents, "html.parser")
-        # block.append(pre_soup)
-        block.append(parsed)
-
+    anchor_headers(new_soup)
+    syntax_highlighting(new_soup)
+    image_titles(new_soup)
 
     if pretty:
         return new_soup.prettify()

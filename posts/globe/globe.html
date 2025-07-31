@@ -1,7 +1,8 @@
 
 <html>
 <head><link href="../../static/main.css" rel="stylesheet"/></head>
-<body><img alt="beautiful site logo" id="site-logo" src="../../static/base_logo.png"/><h1 id="turning-the-globe-into-a-3d-mesh">Turning the globe into a 3D mesh</h1>
+<body><img alt="beautiful site logo" id="site-logo" src="../../static/base_logo.png" width="200"/>
+<h1 id="turning-the-globe-into-a-3d-mesh">Turning the globe into a 3D mesh</h1>
 <p>I was working on a video where I wanted to visualise various locations across the former Soviet Union.
 The requirements were pretty straightforward:</p>
 <ul>
@@ -29,7 +30,7 @@ This includes the country and region borders that we need.</p>
 </pre></div>
 </code>.</p>
 <p>EX: Reading Luxembourg's border from the 1:50M country border dataset:</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">geopandas</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">gpd</span>
 
 <span class="n">data</span> <span class="o">=</span> <span class="n">gpd</span><span class="o">.</span><span class="n">read_file</span><span class="p">(</span><span class="s2">"ne_50m_admin_0_countries.shp"</span><span class="p">)</span>
 <span class="n">geo_data</span> <span class="o">=</span> <span class="n">data</span><span class="o">.</span><span class="n">loc</span><span class="p">[</span><span class="n">data</span><span class="p">[</span><span class="s2">"SOVEREIGNT"</span><span class="p">]</span> <span class="o">==</span> <span class="s2">"Luxembourg"</span><span class="p">][</span><span class="s2">"geometry"</span><span class="p">]</span>
@@ -41,15 +42,15 @@ This includes the country and region borders that we need.</p>
 <span class="k">else</span><span class="p">:</span>
     <span class="n">luxembourg</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">geo_data</span><span class="o">.</span><span class="n">exterior</span><span class="o">.</span><span class="n">coords</span><span class="p">)</span>
 </pre></div>
-</code></pre>
+</code>
 <p>The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).</p>
-<p><img alt="luxembourg outline" src="luxembourg.png" title="TESTING TITLE"/></p>
+<div class="img-root"><div class="img-div"><img alt="luxembourg outline" src="luxembourg.png" title="TESTING TITLE"/><p class="img-title">Figure 1: TESTING TITLE</p></div></div>
 <p>In Natural Earth's dataset all borders/shapes are described in a clock-wise order, which is something that will come in handy later on!</p>
 <h2 id="placing-coordinates-in-3d-space">Placing coordinates in 3D space</h2>
 <p>Coordinates describe points on a sphere, but we want points in 3D.
 The following function transforms a coordinate into a point in 3D space on a sphere of radius 1.</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">coord_on_sphere</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">coord_on_sphere</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">y</span><span class="p">)</span> <span class="o">-&gt;</span> <span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">:</span>
 <span class="w">    </span><span class="sd">"""Translate (lon,lat) point to a point on a 3D sphere"""</span>
     <span class="n">radian_ratio</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">pi</span> <span class="o">/</span> <span class="mi">180</span>
     <span class="n">x1</span> <span class="o">=</span> <span class="n">math</span><span class="o">.</span><span class="n">cos</span><span class="p">(</span><span class="n">y</span> <span class="o">*</span> <span class="n">radian_ratio</span><span class="p">)</span>
@@ -64,40 +65,40 @@ The following function transforms a coordinate into a point in 3D space on a sph
 
     <span class="k">return</span> <span class="n">np</span><span class="o">.</span><span class="n">array</span><span class="p">((</span><span class="n">x2</span><span class="p">,</span> <span class="n">y2</span><span class="p">,</span> <span class="n">z1</span><span class="p">))</span>
 </pre></div>
-</code></pre>
+</code>
 <p>If we then write all of these 3D points to an <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">.OBJ</a> file and connect them using <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements">lines</a> we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.</p>
-<p><img alt="perfect lines" src="perfect-lines.jpg"/> <img alt="faulty lines" src="faulty-lines.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="perfect lines" src="perfect-lines.jpg"/><p class="img-title">Figure 2</p></div> <div class="img-div"><img alt="faulty lines" src="faulty-lines.jpg" title="test"/><p class="img-title">Figure 3: test</p></div></div>
 <p>It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.</p>
-<p><img alt="slice-lines" src="slice-lines.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="slice-lines" src="slice-lines.jpg"/><p class="img-title">Figure 4</p></div></div>
 <h2 id="journey-to-the-center-of-the-earth">Journey to the center of the Earth</h2>
 <p>So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.</p>
-<p><img alt="3icos" src="3icos-numbers.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="3icos" src="3icos-numbers.jpg"/><p class="img-title">Figure 5</p></div></div>
 <p>We will continue for now with a low res icosahedron (number 1 in the image) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!</p>
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
 <p>The general implementation looks something like this:</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="n">P</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="n">p1</span><span class="p">,</span> <span class="n">p2</span><span class="p">,</span> <span class="n">p3</span><span class="p">)</span>
 <span class="n">O</span> <span class="o">=</span> <span class="n">Point</span><span class="p">(</span><span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">,</span> <span class="mi">0</span><span class="p">)</span>
 <span class="k">for</span> <span class="n">triangle</span> <span class="ow">in</span> <span class="n">base_mesh</span><span class="p">:</span>
     <span class="n">P_prime</span><span class="p">:</span> <span class="n">Point</span> <span class="o">=</span> <span class="n">intersection</span><span class="p">(</span><span class="n">triangle</span><span class="p">,</span> <span class="n">P</span><span class="p">,</span> <span class="n">O</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">P_prime</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
         <span class="k">return</span> <span class="n">P_prime</span>
 </pre></div>
-</code></pre>
+</code>
 <p>Now all our points live on this spherical approximation, consisting of triangles.</p>
-<p><img alt="ico-projection" src="ico-projection.jpg"/> <img alt="ico-projection-globe" src="ico-project-globe.png"/></p>
+<div class="img-root"><div class="img-div"><img alt="ico-projection" src="ico-projection.jpg"/><p class="img-title">Figure 6</p></div> <div class="img-div"><img alt="ico-projection-globe" src="ico-project-globe.png"/><p class="img-title">Figure 7</p></div></div>
 <h2 id="connecting-the-dots">Connecting the dots</h2>
 <p>Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.</p>
-<p><img alt="crossing-zoom" src="edge-crossing-zoom-bad.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="edge-crossing-zoom-bad.jpg"/><p class="img-title">Figure 8</p></div></div>
 <p>Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
 If we name these 2 "problematic" points <strong>A</strong> and <strong>B</strong>, then we want to transform line <strong>AB</strong> so that it follows the surface.
 In order to do that we just split up <strong>AB</strong> into 2 separate lines <strong>AE</strong> and <strong>EB</strong> where <strong>E</strong> is a point on the edge <strong>e</strong> that the 2 triangles have in common. This way <strong>AE</strong> lies completely on the same triangle <strong>A</strong> lives on, and the same goes for <strong>EB</strong> and <strong>B</strong>.</p>
 <p>Sounds easy enough, but where does <strong>E</strong> lie exactly? In the middle of the edge or closer to one of its points?
 The exact position of <strong>E</strong> is defined in such a way that the sum both lines is as as small as possible, meaning <strong>min(|AE| + |EB|)</strong>.
 There might be a cool formula for this, but I went with an iterative approach:</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="c1"># Find the edge between point A and B</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="c1"># Find the edge between point A and B</span>
 <span class="n">T1</span> <span class="o">=</span> <span class="n">Triangle</span><span class="p">(</span><span class="n">A</span><span class="p">)</span>
 <span class="n">T2</span> <span class="o">=</span> <span class="n">Triangle</span><span class="p">(</span><span class="n">B</span><span class="p">)</span>
 <span class="n">e</span> <span class="o">=</span> <span class="n">shared_edge</span><span class="p">(</span><span class="n">T1</span><span class="p">,</span> <span class="n">T2</span><span class="p">)</span>
@@ -113,14 +114,14 @@ There might be a cool formula for this, but I went with an iterative approach:</
 
 <span class="k">return</span> <span class="n">Y</span>
 </pre></div>
-</code></pre>
+</code>
 <video controls="">
 <source src="animations/connecting.webm" type="video/webm"/>
 </video>
 <h3 id="crossing-multiple-triangles">Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">connect_2_points</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">connect_2_points</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
     <span class="k">if</span> <span class="n">on_neighbouring_triangles</span><span class="p">(</span><span class="n">A</span><span class="p">,</span> <span class="n">B</span><span class="p">):</span>
         <span class="k">return</span>
 
@@ -138,12 +139,12 @@ To decide what triangles lie in the middle we do the following:</p>
             <span class="n">connect_2_points</span><span class="p">(</span><span class="n">C</span><span class="p">,</span> <span class="n">B</span><span class="p">)</span>
             <span class="k">break</span>
 </pre></div>
-</code></pre>
+</code>
 <p>Once all points are on neighbouring triangles we can apply algorithm one again.</p>
 <video controls="">
 <source src="animations/cross-connecting.webm" type="video/webm"/>
 </video>
-<p><img alt="crossing-zoom" src="edge-crossing-zoom-good.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="edge-crossing-zoom-good.jpg"/><p class="img-title">Figure 9</p></div></div>
 <p>That looks pretty good already! In fact it satisfies all of our requrements except 1.</p>
 <ul>
 <li>We can add region borders the same way as we did country borders.</li>
@@ -162,9 +163,9 @@ The second caveat is that as we've seen before, countries can span various trian
 <h3 id="redraw-the-borders">Redraw the borders</h3>
 <p>I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
 The end goal is to split the country up into 7 parts, that each lie completely on one the icosahedron's triangles.</p>
-<p><img alt="uganda-sections" src="uganda-sections.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="uganda-sections" src="uganda-sections.jpg"/><p class="img-title">Figure 10</p></div></div>
 <p>In a first pass, we will collect all points per edge and sort them </p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">prepare_edges_and_corner_vertices</span><span class="p">(</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">prepare_edges_and_corner_vertices</span><span class="p">(</span>
     <span class="n">vertices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">faces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="n">EdgeI</span><span class="p">],</span> <span class="n">mesh</span>
 <span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">dict</span><span class="p">[</span><span class="n">EdgeI</span><span class="p">,</span> <span class="n">EdgeDictV</span><span class="p">]:</span>
 <span class="w">    </span><span class="sd">"""</span>
@@ -223,9 +224,9 @@ The end goal is to split the country up into 7 parts, that each lie completely o
 
     <span class="k">return</span> <span class="n">edge_dict</span>
 </pre></div>
-</code></pre>
+</code>
 <p>This will give us the following dictionary (simplified here):</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="p">{</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
         <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">8</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mi">0</span><span class="p">),</span>
         <span class="p">(</span><span class="n">index</span><span class="o">=</span><span class="mi">4</span><span class="p">,</span> <span class="n">distance</span><span class="o">=</span><span class="mf">0.075</span><span class="p">)</span>
@@ -250,16 +251,16 @@ The end goal is to split the country up into 7 parts, that each lie completely o
     <span class="p">],</span>
 <span class="p">}</span> 
 </pre></div>
-</code></pre>
+</code>
 <p>To give a bit more detail on the last for loop; here we decide per edge whether a face vertex should be included as a part of our new shapes. By face vertices I mean vertices that make up the faces of the base shape: the icosahedron.
 We can already see that in this case vertex 8 should be included, as it's a vertex of 5 of our new shapes (all except the green one in our image).
 All the other face vertices of the edges we cross are not included (e.g. 4 and 1, they are off screen but we can see them in the dictionary).</p>
 <p>To decide which face vertices should be included we can make use of the fact that the country borders are all defined anti-clockwise. Imagine you're walking along the border in an anti-clockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
 If for example vertex 15 went straight back to vertex 4 and closed the country border that way, then the closest vertex left of 15 is 13, which is not a face vertex. As such 8 will never be included.</p>
-<p><img alt="uganda-numbered" src="uganda-numbered.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="uganda-numbered" src="uganda-numbered.jpg"/><p class="img-title">Figure 11</p></div></div>
 <p>Using this dictionary, we can construct our new shapes. We go over our border in an anti-clockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
 The following pseudo-code describes how we will end up with our newly defined shapes:</p>
-<pre><code class="language-py"><div class="highlight"><pre><span></span><span class="n">new_shapes</span> <span class="o">=</span> <span class="p">[]</span>
+<code class="language-py"><div class="highlight"><pre><span></span><span class="n">new_shapes</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[]</span>
 <span class="n">edge_vertices</span> <span class="o">=</span> <span class="p">[</span><span class="o">...</span><span class="p">]</span>
 <span class="k">for</span> <span class="n">vertex</span> <span class="ow">in</span> <span class="n">border</span><span class="p">:</span>
@@ -276,16 +277,16 @@ The following pseudo-code describes how we will end up with our newly defined sh
             <span class="k">continue</span>
         <span class="n">vertex</span> <span class="o">=</span> <span class="n">closest_vertex_left</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
 </pre></div>
-</code></pre>
+</code>
 <p><code><div class="highlight"><pre><span></span><span class="n">closes_vertex_left</span><span class="p">()</span>
 </pre></div>
 </code> will loop around the face. In our example that means we go from 17 &gt; 8 &gt; 4. </p>
 <h3 id="chop-up-the-pieces">Chop up the pieces</h3>
 <p>Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D.
 We apply the algorithm, transform back into 3D and that's it!</p>
-<p><img alt="uganda-triangles" src="uganda-triangles.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="uganda-triangles" src="uganda-triangles.jpg"/><p class="img-title">Figure 12</p></div></div>
 <p>Doing this for every single country means our project is complete! Though the wireframe does look very messy.</p>
-<p><img alt="triangulated-earth" src="triangulated-earth.jpg"/></p>
+<div class="img-root"><div class="img-div"><img alt="triangulated-earth" src="triangulated-earth.jpg"/><p class="img-title">Figure 13</p></div></div>
 <h2 id="conclusion">Conclusion</h2>
 <p>Phew, that was a journey.</p>
 <p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.
