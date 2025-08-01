@@ -1,9 +1,11 @@
 from bs4 import BeautifulSoup
 from marko import Parser, Renderer, convert
 import os
+import pathlib
 from pygments import highlight
 from pygments.lexers import PythonLexer
 from pygments.formatters import HtmlFormatter
+import re
 
 
 def get_header(rel_dir: str) -> BeautifulSoup:
@@ -38,27 +40,33 @@ def syntax_highlighting(soup: BeautifulSoup):
     # Apply code syntax highlighting
     code_blocks = soup.find_all("code")
     for block in code_blocks:
+        parent = block.parent
+        if parent.name != "pre":
+            continue
+
         highlighted = highlight(block.get_text(), PythonLexer(), HtmlFormatter())
         parsed = BeautifulSoup(highlighted, "html.parser")
         block.string = ""
 
-        # Extract code if it's inside of a <pre>
-        parent = block.parent
-        if parent.name == "pre":
-            parent.insert_after(block.extract())
-            if not parent.text.strip():
-                # Delete empty <pre>
-                parent.decompose()
+        # Extract code out of <pre>
+        parent.insert_after(block.extract())
+        if not parent.text.strip():
+            # Delete empty <pre>
+            parent.decompose()
 
         block.append(parsed)
 
 
 def image_titles(soup: BeautifulSoup):
     img_counter = 1
+    img_dict = {}
 
     for img in soup.find_all("img"):
         if img.get("id") == "site-logo":
             continue
+
+        img_id = pathlib.Path(img["src"]).stem.replace(" ", "-")
+        img_dict[img_id] = f"Figure {img_counter}"
 
         # Wrap img in a div
         div = soup.new_tag("div", attrs={"class": "img-div"})
@@ -69,13 +77,29 @@ def image_titles(soup: BeautifulSoup):
         div.parent.name = "div"
         div.parent["class"] = "img-root"
 
-        title = img.get("title")
-        title = f"Figure {img_counter}{f": {title}" if title else ""}"
+        if title := img.get("title"):
+            title = f"<b>Figure {img_counter}:</b> {title}"
+        else:
+            title = f"<b>Figure {img_counter}</b>"
 
-        title = soup.new_tag("p", string=title, attrs={"class": "img-title"})
+        title_soup = BeautifulSoup(title, "html.parser")
+        title = soup.new_tag("p", attrs={"class": "img-title"})
+        title.append(title_soup)
         img.insert_after(title)
 
         img_counter += 1
+
+    # Replace image references
+    img_link_regex = re.compile(r"\[\[(.*?)\]\]")
+    for text_node in soup.find_all(string=True):
+        if match := set(img_link_regex.findall(text_node)):
+            new_text = text_node
+            for m in match:
+                to_replace = f"[[{m}]]"
+                figure_ref = f"<i>{img_dict[m]}</i>"
+                new_text = new_text.replace(to_replace, figure_ref)
+            new_text = BeautifulSoup(new_text, "html.parser")
+            text_node.replace_with(new_text)
 
 
 def process_html(html: str, dir: str, pretty: bool = False) -> None:
@@ -83,7 +107,6 @@ def process_html(html: str, dir: str, pretty: bool = False) -> None:
     rel_dir = get_relative_dir_offset(dir)
 
     css = os.path.join(rel_dir, "static", "main.css")
-    print(css)
     template = f"""
     <html>
     <head><link rel="stylesheet" href={css}></head>

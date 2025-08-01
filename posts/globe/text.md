@@ -1,6 +1,6 @@
 # Turning the globe into a 3D mesh
 
-I was working on a video where I wanted to visualise various locations across the former Soviet Union. 
+I was working on [a video](https://youtu.be/GxhLSzhGFWo?feature=shared) where I needed to visualise various locations across the former Soviet Union. 
 The requirements were pretty straightforward:
 * Country borders
 * Region borders (states, provinces, ...)
@@ -14,7 +14,7 @@ distortions towards the poles. The alternative is thus to just stay in the world
 
 The simplest way one might achieve this is by drawing the country borders to some texture, and wrapping that texture around a 3D mesh.
 In that case we will be dealing with distortions again due to the translation from 2D <-> 3D.
-Additionally, since a texture has a finite resolution, zooming into far means you start seeing the pixels which violates our "looks nice when zoomed in" rule.
+Additionally, since a texture has a finite resolution, zooming into far means you start seeing the pixels which violates our _"looks nice when zoomed in"_ rule.
 
 Although I can't think of any concrete examples, I have seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technical level.
 What to do in that case except come up with your own crazy convoluted solution?
@@ -49,9 +49,10 @@ else:
 The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).
 
-![luxembourg outline](luxembourg.png "TESTING TITLE")
+![luxembourg outline](images/luxembourg.png "Luxembourg")
 
-In Natural Earth's dataset all borders/shapes are described in a clock-wise order, which is something that will come in handy later on!
+In Natural Earth's dataset all borders/shapes are described in a clockwise order, which is something that will come in handy later on! My code is based on it being
+anticlockwise, but it means is that we have to reverse the data.
 
 ## Placing coordinates in 3D space
 
@@ -75,23 +76,23 @@ def coord_on_sphere(x, y) -> np.ndarray:
     return np.array((x2, y2, z1))
 ```
 
-If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the result in image 1. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in image 2.
+If we then write all of these 3D points to an [.OBJ](https://en.wikipedia.org/wiki/Wavefront_.obj_file) file and connect them using [lines](https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements) we get the result in [[perfect-lines]]. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in [[faulty-lines]].
 
-![perfect lines](perfect-lines.jpg) ![faulty lines](faulty-lines.jpg "test")
+![perfect lines](images/perfect-lines.jpg "Country borders") ![faulty lines](images/faulty-lines.jpg "Country borders overlayed on a sphere")
 
 It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.
 
-![slice-lines](slice-lines.jpg)
+![slice-lines](images/slice-lines.jpg "Lines cutting through the sphere")
 
 ## Journey to the center of the Earth
 
 So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.
 
-![3icos](3icos-numbers.jpg)
+![3icos](images/3icos-numbers.jpg "Different icosahedron resolutions")
 
-We will continue for now with a low res icosahedron (number 1 in the image) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!
+We will continue for now with a low res icosahedron (number 1 in [[3icos-numbers]]) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!
 
 In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.
@@ -108,14 +109,14 @@ for triangle in base_mesh:
 
 Now all our points live on this spherical approximation, consisting of triangles.
 
-![ico-projection](ico-projection.jpg) ![ico-projection-globe](ico-project-globe.png)
+![ico-projection](images/ico-projection.jpg "Projecting a spherical point onto our base") ![ico-projection-globe](images/ico-project-globe.png "All countries projected")
 
 
 ## Connecting the dots
 
 Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.
 
-![crossing-zoom](edge-crossing-zoom-bad.jpg)
+![crossing-zoom](images/edge-crossing-zoom-bad.jpg "Nepal cutting through the icosahedron's edge")
 
 Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
 If we name these 2 "problematic" points **A** and **B**, then we want to transform line **AB** so that it follows the surface.
@@ -178,7 +179,7 @@ Once all points are on neighbouring triangles we can apply algorithm one again.
     <source src="animations/cross-connecting.webm" type="video/webm"/>
 </video>
 
-![crossing-zoom](edge-crossing-zoom-good.jpg)
+![crossing-zoom](images/edge-crossing-zoom-good.jpg "A happy Nepal")
 
 That looks pretty good already! In fact it satisfies all of our requrements except 1.
 * We can add region borders the same way as we did country borders.
@@ -203,7 +204,7 @@ The second caveat is that as we've seen before, countries can span various trian
 I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
 The end goal is to split the country up into 7 parts, that each lie completely on one the icosahedron's triangles.
 
-![uganda-sections](uganda-sections.jpg)
+![uganda-sections](images/uganda-sections.jpg "Uganda divided into completely flat shapes")
 
 In a first pass, we will collect all points per edge and sort them 
 
@@ -300,12 +301,12 @@ To give a bit more detail on the last for loop; here we decide per edge whether 
 We can already see that in this case vertex 8 should be included, as it's a vertex of 5 of our new shapes (all except the green one in our image).
 All the other face vertices of the edges we cross are not included (e.g. 4 and 1, they are off screen but we can see them in the dictionary).
 
-To decide which face vertices should be included we can make use of the fact that the country borders are all defined anti-clockwise. Imagine you're walking along the border in an anti-clockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
+To decide which face vertices should be included we can make use of the fact that the country borders are all defined clockwise. Imagine you're walking along the border in an anticlockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
 If for example vertex 15 went straight back to vertex 4 and closed the country border that way, then the closest vertex left of 15 is 13, which is not a face vertex. As such 8 will never be included.
 
-![uganda-numbered](uganda-numbered.jpg)
+![uganda-numbered](images/uganda-numbered.jpg "All edge vertices numbered (including the face vertex)")
 
-Using this dictionary, we can construct our new shapes. We go over our border in an anti-clockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
+Using this dictionary, we can construct our new shapes. We go over our border in an anticlockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
 The following pseudo-code describes how we will end up with our newly defined shapes:
 
 ```py
@@ -334,11 +335,9 @@ for vertex in border:
 Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D. 
 We apply the algorithm, transform back into 3D and that's it!
 
-![uganda-triangles](uganda-triangles.jpg)
-
 Doing this for every single country means our project is complete! Though the wireframe does look very messy.
 
-![triangulated-earth](triangulated-earth.jpg)
+![uganda-triangles](images/uganda-triangles.jpg "A triangulated Uganda") ![triangulated-earth](images/triangulated-earth.jpg "The whole world, completely triangulated")
 
 ## Conclusion
 

@@ -39,16 +39,8 @@ h2 {
   font-size: 30;
 }
 
-pre {
-  color: #515151;
-  background: #DCF2E5;
-  padding: 20px;
-  border-radius: 7px;
-}
-
-
 img {
-  mix-blend-mode: darken;  
+  mix-blend-mode: darken;
 }
 
 .img-root {
@@ -56,15 +48,16 @@ img {
   width: 100%;
   gap: 50px;
   justify-content: center;
+  align-items: flex-start;
   margin-top: 50px;
   margin-bottom: 50px;
-  align-items: stretch;
 }
 
-.img-root > div {
+.img-root>div {
   width: 100%;
   display: flex;
   flex-direction: column;
+  align-items: center;
 }
 
 .img-root img {
@@ -76,6 +69,8 @@ img {
 
 .img-title {
   text-align: center;
+  font-size: 16px;
+  font-style: italic;
 }
 
 video {
@@ -88,21 +83,48 @@ video {
 
 /* Everything code related */
 
-code {
+code:not(:has(> *)) {
+  color: #515151;
+  background: #DCF2E5;
+  border-radius: 4px;
+  padding-left: 3px;
+  padding-right: 3px;
+}
+
+code>div>pre {
   font-size: 12;
-  color: #515151;
-  background: #DCF2E5;
-  /* padding: 3px; */
-  border-radius: 4px;
+  overflow-x: scroll;
+  color: #8f3f71;
+  background: #f0f0f0;
+  padding: 20px;
+  border-radius: 7px;
+  border-style: solid;
+  border-color: #d0d0d0;
 }
 
-code:not(pre *) {
-  color: #515151;
-  background: #DCF2E5;
-  /* padding: 3px; */
-  border-radius: 4px;
-}
-
+/* Function definitions */
 .nf {
-  color: #00007F;
+  color: #79740e;
+}
+
+.n {
+  color: #3c3836;
+}
+
+/* String */
+.s2 {
+  color: #79740e;
+}
+
+/* Comments */
+.c1,
+.sd {
+  color: #7c6f64;
+}
+
+/* Keywords */
+.k,
+.kn,
+.ow {
+  color: #9d0006;
 }
