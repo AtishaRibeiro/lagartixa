@@ -1,0 +1,16 @@
+<div id="video-container">
+  {% for video in videos %}
+  <div class="video-card">
+    <div class="video-info">
+      <p class="video-title">{{ video.name }}</p>
+      <p class="video-date">{{ video.uploaded }}</p>
+      <p class="video-description">{{ video.description }}</p>
+    </div>
+    <img src="videos/{{ video.thumbnail }}" />
+  </div>
+
+  <!-- <iframe width="560" height="315" src="{{ video.url }}" title="YouTube video player" frameborder="0" -->
+  <!-- allow="accelerometer; autoplay; clipboard-write; encrypted-media; gyroscope; picture-in-picture; web-share" -->
+  <!-- referrerpolicy="strict-origin-when-cross-origin" allowfullscreen></iframe> -->
+  {% endfor %}
+</div>

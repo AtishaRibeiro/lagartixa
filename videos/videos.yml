@@ -1,0 +1,30 @@
+- name: Bald and Bankrupt in the former USSR 
+  description: A compilation of all the places the youtuber Bald and Bankrupt visited in the former USSR.
+  youtube-description: |
+    Dedicated to the people, cultures and languages of the former Soviet Union.
+
+    Some clarfications.
+    * All country/region borders are the way they are because I use Natural Earth's data, which uses *de facto* boundaries.
+    * I chose to stick to 1 language per country for place names for practical reasons. I'm aware that Russian is more widely spoken in Belarus, but Google Maps uses Belarusian which is why I also use it. There are 2 exceptions:
+     1. Pobeda in Georgia. AFAIK it has no Georgian name since the town was created in the USSR.
+     2. Karki/Tigranashen. I didn't want to make it seem like I was picking a side, so I included both.
+    * I removed duplicate locations within a single video, to reduce video length.
+    * I'm aware Bald visited Tajikistan in a later video, but for me the USSR story ended with the video where he got kicked out of Russia.
+    * I left out a few videos:
+    1. Summary videos of Tuva and Belarus.
+    2. Intro video for Georgia
+    3. "Stranded On A Russian Highway!" which is actually about going to Bolivia
+    4. Videos that were deleted by Bald
+    5. Videos from the Daily Bald channel
+
+    Music by the one and only Kino.
+  uploaded: 2025-04-13
+  url: https://youtu.be/h6sWmyb0UcA
+  thumbnail: ussr.jpg
+  notes: Originally uploaded on 2025-03-30 but it turned out I forgot to hightlight Latvia as part of the USSR in the intro, so I fixed it and reuploaded.
+- name: Prognoz Visualiser 
+  description: A visualiser for Molchat Doma's Prognoz. Including lyrics. 
+  youtube-description: спасибо молчат дома
+  uploaded: 2024-09-15
+  url: https://youtu.be/kZWvIx-0sA8
+  thumbnail: prognoz.webp
