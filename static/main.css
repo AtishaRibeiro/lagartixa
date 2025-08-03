@@ -1,3 +1,5 @@
+@import url("header.css");
+
 @font-face {
   font-family: dynapuff;
   src: url("static/fonts/DynaPuff/DynaPuff-VariableFont_wdth,wght.ttf");

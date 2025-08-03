@@ -1,4 +1,5 @@
 from bs4 import BeautifulSoup
+from jinja2 import Environment, FileSystemLoader
 from marko import Parser, Renderer, convert
 import os
 import pathlib
@@ -12,9 +13,12 @@ def get_header(rel_dir: str) -> BeautifulSoup:
     with open("templates/header.html", "r") as f:
         soup = BeautifulSoup(f.read(), "html.parser")
 
-    images = soup.find_all("img")
-    for i in images:
-        i["src"] = os.path.join(rel_dir, i["src"])
+    for image in soup.find_all("img"):
+        image["src"] = os.path.join(rel_dir, image["src"])
+
+    for link in soup.find_all("a"):
+        if "href" in link.attrs:
+            link["href"] = os.path.join(rel_dir, link["href"])
 
     return soup
 
@@ -26,7 +30,7 @@ def get_relative_dir_offset(dir: str) -> str:
     return "/".join([".."] * nr_dirs)
 
 
-def anchor_headers(soup: BeautifulSoup):
+def anchor_headers(soup: BeautifulSoup) -> None:
     # Create id's for headers so they can be anchored
     headers = soup.find_all(["h1", "h2", "h3", "h4", "h5", "h6"])
     for header in headers:
@@ -36,7 +40,7 @@ def anchor_headers(soup: BeautifulSoup):
         header["id"] = text
 
 
-def syntax_highlighting(soup: BeautifulSoup):
+def syntax_highlighting(soup: BeautifulSoup) -> None:
     # Apply code syntax highlighting
     code_blocks = soup.find_all("code")
     for block in code_blocks:
@@ -57,7 +61,7 @@ def syntax_highlighting(soup: BeautifulSoup):
         block.append(parsed)
 
 
-def process_figures(soup: BeautifulSoup):
+def process_figures(soup: BeautifulSoup) -> None:
     """Process images and videos"""
 
     img_counter = 1
@@ -77,7 +81,7 @@ def process_figures(soup: BeautifulSoup):
             img.name = "video controls"
             img.attrs = {}
             video = soup.new_tag(
-                "source", attrs={"src": img_src, "type": f"video/{img_src.suffix[1:]}" }
+                "source", attrs={"src": img_src, "type": f"video/{img_src.suffix[1:]}"}
             )
             img.append(video)
         else:
@@ -120,7 +124,7 @@ def process_figures(soup: BeautifulSoup):
             text_node.replace_with(new_text)
 
 
-def process_html(html: str, dir: str, pretty: bool = False) -> None:
+def process_html(html: str, dir: str = ".") -> BeautifulSoup:
     soup: BeatifulSoup = BeautifulSoup(html, "html.parser")
     rel_dir = get_relative_dir_offset(dir)
 
@@ -136,14 +140,7 @@ def process_html(html: str, dir: str, pretty: bool = False) -> None:
     new_soup.body.append(header)
     new_soup.body.append(soup)
 
-    anchor_headers(new_soup)
-    syntax_highlighting(new_soup)
-    process_figures(new_soup)
-    # process_videos(new_soup)
-
-    if pretty:
-        return new_soup.prettify()
-    return str(new_soup)
+    return new_soup
 
 
 def generate_post_html(name: str) -> None:
@@ -152,14 +149,43 @@ def generate_post_html(name: str) -> None:
     with open(markdown, "r") as f:
         html = convert(f.read())
 
-    html = process_html(html, post_dir, False)
+    # html = process_html(html, post_dir)
+    html: BeatifulSoup = BeautifulSoup(html, "html.parser")
+
+    anchor_headers(html)
+    syntax_highlighting(html)
+    process_figures(html)
+
+    env = Environment(loader=FileSystemLoader("templates"))
+    base_template = env.get_template("base.html")
+
+    rel_dir = get_relative_dir_offset(post_dir)
+    css = os.path.join(rel_dir, "static", "main.css")
+    post_rendered = base_template.render(contents=str(html), styles=[css])
+    print(post_rendered)
+
     html_path = os.path.join(post_dir, f"{name}.html")
     with open(html_path, "w") as f:
-        f.write(html)
+        f.write(post_rendered)
+
+
+def generate_main_html() -> None:
+    env = Environment(loader=FileSystemLoader("templates"))
+    base_template = env.get_template("base.html")
+
+    with open("templates/home.html", "r") as f:
+        html = f.read()
+
+    post_rendered = base_template.render(contents=str(html), styles=["static/main.css"])
+    print(post_rendered)
+
+    with open("index.html", "w") as f:
+        f.write(post_rendered)
 
 
 def main():
     generate_post_html("globe")
+    generate_main_html()
 
 
 if __name__ == "__main__":

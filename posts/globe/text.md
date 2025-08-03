@@ -348,7 +348,7 @@ We can choose other shapes than the icosahedron. [[different-bases]] shows a few
 
 ## Conclusion
 
-Phew, that was a journey.
+Phew, what a journey.
 
 I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
 If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe).

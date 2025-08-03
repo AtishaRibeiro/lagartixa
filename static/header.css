@@ -1,0 +1,27 @@
+#header {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+}
+
+#header > div {
+  display: flex;
+}
+
+#header > div > a {
+  margin: auto;
+  width: 100%;
+  padding-top: 20px;
+
+  font-weight: bold;
+  font-size: 20px;
+  text-decoration: none;
+  color: #0D0D0D;
+}
+
+#header > div > .right {
+  text-align: right;
+}
+
+#header > div > .left {
+  text-align: left;
+}

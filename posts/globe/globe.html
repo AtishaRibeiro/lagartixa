@@ -1,8 +1,22 @@
+<!DOCTYPE html>
+<html lang="">
+<head>
 
-<html>
-<head><link href="../../static/main.css" rel="stylesheet"/></head>
-<body><img alt="beautiful site logo" id="site-logo" src="../../static/base_logo.png" width="200"/>
-<h1 id="turning-the-globe-into-a-3d-mesh">Turning the globe into a 3D mesh</h1>
+  <link rel="stylesheet" href="../../static/main.css">
+
+</head>
+<body>
+  <div id="header">
+  <div>
+    <a class="right" href="main.html">Home</a>
+    <a class="right">Videos</a>
+  </div>
+  <img id="site-logo" src="static/base_logo.png" alt="beautiful site logo" width="200"/>
+  <div>
+    <a class="left">About</a>
+  </div>
+</div>
+  <h1 id="turning-the-globe-into-a-3d-mesh">Turning the globe into a 3D mesh</h1>
 <p>I was working on <a href="https://youtu.be/GxhLSzhGFWo?feature=shared">a video</a> where I needed to visualise various locations across the former Soviet Union.
 The requirements were pretty straightforward:</p>
 <ol>
@@ -222,22 +236,6 @@ The end goal is to split the country up into 6 parts, that each lie completely o
     <span class="k">return</span> <span class="n">edge_dict</span>
 </pre></div>
 </code>
-<code class="language-py"><div class="highlight"><pre><span></span><span class="n">edge_face_dict</span><span class="p">:</span> <span class="nb">dict</span><span class="p">[</span><span class="n">Edge</span><span class="p">,</span> <span class="nb">int</span><span class="p">]</span> <span class="o">=</span> <span class="p">{}</span>
-
-<span class="k">for</span> <span class="n">v</span> <span class="ow">in</span> <span class="n">vertices</span><span class="p">:</span>
-
-    <span class="c1"># We're only interested in vertices lying on an edge</span>
-    <span class="k">if</span> <span class="ow">not</span> <span class="n">on_edge</span><span class="p">(</span><span class="n">v</span><span class="p">):</span>
-        <span class="k">continue</span>
-    
-    <span class="c1"># Each edge is linked to one of its neighbouring faces.</span>
-    <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">edge_face_dict</span><span class="p">:</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">f</span><span class="o">.</span><span class="n">faces</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-        <span class="n">edge_face_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span> <span class="o">=</span> <span class="n">face</span>
-    <span class="k">else</span><span class="p">:</span>
-        <span class="n">face</span> <span class="o">=</span> <span class="n">edge_face_dict</span><span class="p">[</span><span class="n">f</span><span class="p">]</span>
-</pre></div>
-</code>
 <p>This will give us the following dictionary (simplified here):</p>
 <code class="language-py"><div class="highlight"><pre><span></span><span class="p">{</span>
     <span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="mi">8</span><span class="p">):</span> <span class="p">[</span>
@@ -288,7 +286,6 @@ The following pseudo-code describes how we will end up with our newly defined sh
 
         <span class="n">new_shape</span> <span class="o">=</span> <span class="p">[]</span>
         <span class="n">vertex</span> <span class="o">=</span> <span class="n">edge_vertices</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
-
     <span class="n">new_shape</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span>
     <span class="k">if</span> <span class="n">lies_on_edge</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>           
         <span class="k">if</span> <span class="ow">not</span> <span class="n">is_corner</span><span class="p">(</span><span class="n">vertex</span><span class="p">)</span> <span class="ow">and</span> <span class="ow">not</span> <span class="n">is_leaving_face</span><span class="p">(</span><span class="n">vertex</span><span class="p">):</span>
@@ -307,10 +304,11 @@ We apply the algorithm, transform back into 3D and that's it!</p>
 <p>We can choose other shapes than the icosahedron. <i>Figure 16</i> shows a few different ones. Unfortunately, it's not possible to use just any shape due to the projection that is used. Since all spherical points are projected towards the center, it's expected that there will be something to project onto. A torus which has a hole in the middle will not be able to acommodate points projected from the North and South Pole.</p>
 <div class="img-root"><div class="img-div"><img alt="different-bases" src="images/different-bases.jpg" title="All sorts of different Earth shapes, using different shapes as the base"/><p class="img-title"><b>Figure 16:</b> All sorts of different Earth shapes, using different shapes as the base</p></div></div>
 <h2 id="conclusion">Conclusion</h2>
-<p>Phew, that was a journey.</p>
+<p>Phew, what a journey.</p>
 <p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.
 If you're interested, all code is available on <a href="https://github.com/AtishaRibeiro/globe">the github page</a>.</p>
 <p>Enjoy this final result, I think it looks pretty good:
 TODO</p>
+
 </body>
 </html>
