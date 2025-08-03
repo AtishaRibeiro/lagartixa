@@ -2,12 +2,12 @@
 
 I was working on [a video](https://youtu.be/GxhLSzhGFWo?feature=shared) where I needed to visualise various locations across the former Soviet Union. 
 The requirements were pretty straightforward:
-* Country borders
-* Region borders (states, provinces, ...)
-* Looks nice when zoomed in
-* No distortion
-* Be able to give countries different colours
-* No satellite imagery
+1. Country border
+1. Region borders (states, provinces, ...)
+1. Looks nice when zoomed in
+1. No distortion
+1. Be able to give countries different colours
+1. No satellite imagery
 
 Due to the USSR being so big, it is near impossible to have no visual distortion on a 2D map; think of the Mercator projection that has huge
 distortions towards the poles. The alternative is thus to just stay in the world of 3D.
@@ -31,7 +31,7 @@ This includes the country and region borders that we need.
 
 The data comes in the form of [.shp files](https://en.wikipedia.org/wiki/Shapefile), which we can interpet using `geopandas`.
 
-EX: Reading Luxembourg's border from the 1:50M country border dataset:
+E.g: Reading Luxembourg's border from the 1:50M country border dataset:
 ```py
 import geopandas as gpd
 
@@ -52,7 +52,7 @@ As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points
 ![luxembourg outline](images/luxembourg.png "Luxembourg")
 
 In Natural Earth's dataset all borders/shapes are described in a clockwise order, which is something that will come in handy later on! My code is based on it being
-anticlockwise, but it means is that we have to reverse the data.
+anticlockwise, but all that means is that we have to reverse the data.
 
 ## Placing coordinates in 3D space
 
@@ -94,7 +94,7 @@ This means that any spherical mesh is just an approximation of the real thing. T
 
 We will continue for now with a low res icosahedron (number 1 in [[3icos-numbers]]) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!
 
-In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our "base" and so our points need to lie on this base.
+In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our base and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.
 
 The general implementation looks something like this:
@@ -143,9 +143,7 @@ for i in range(15):
 return Y
 ```
 
-<video controls>
-    <source src="animations/connecting.webm" type="video/webm"/>
-</video>
+![connecting](animations/connecting.webm "Iteratively finding the shortest path between 2 points on adjacent faces")
 
 
 ### Crossing multiple triangles
@@ -175,9 +173,7 @@ def connect_2_points(A, B):
 
 Once all points are on neighbouring triangles we can apply algorithm one again.
 
-<video controls>
-    <source src="animations/cross-connecting.webm" type="video/webm"/>
-</video>
+![crossing-zoom](animations/cross-connecting.webm "A happy Nepal")
 
 ![crossing-zoom](images/edge-crossing-zoom-good.jpg "A happy Nepal")
 
@@ -195,16 +191,16 @@ Up until now we've only created outlines of countries, but meshes consist of tri
 Luckily there already exist some triangulation algorithms that are not that hard to implement, like the [ear clipping algorithm](https://nils-olovsson.se/articles/ear_clipping_triangulation/).
 This will allow us to divide our shapes (countries) into individual triangles that describe our mesh.
 
-Although the algorithm is very simple, there are 2 caveats that complicate things. To start with, the algorithm works in 2D but we are operating in 3D.
-Since all our points lie on triangles, all points that share a triangle lie on the same plane and as such we can treat them as if they live in 2D space.
-The second caveat is that as we've seen before, countries can span various triangles, so we will need a way to split up our country into pieces so each piece lies on a single triangle.
+The algorithm is quite simple, but it only works in 2D.
+1. Countries that cover only one triangle of the base are essentially already a 2D shape and the triangle they lie on is "flat". We can thus do a simple transformation where the triangle is transformed so it lays flat on the XY plane, and ignore the Z axis (which will then be 0).
+1. Countries that span multiple triangles of the base will have to be split into segments that each lie completely on a single triangle of the base. Each segment can then be treated like in the first point.
 
 ### Redraw the borders
 
-I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
-The end goal is to split the country up into 7 parts, that each lie completely on one the icosahedron's triangles.
+For point `2.` I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
+The end goal is to split the country up into 6 parts, that each lie completely on one the icosahedron's triangles.
 
-![uganda-sections](images/uganda-sections.jpg "Uganda divided into completely flat shapes")
+![uganda-sections](images/uganda-sections.jpg "Uganda divided into 6 completely flat shapes")
 
 In a first pass, we will collect all points per edge and sort them 
 
@@ -218,7 +214,7 @@ def prepare_edges_and_corner_vertices(
     * d = distance to B
     The list is sorted so that the point closest to B appears earlier in the list.
     If A or B itself is also determined to be part of our eventual shape, it is
-    added to the list. For those, p will be the index in `mesh`, instead of `points`.
+    added to the list. For those, p will be the index in `mesh`, instead of `vertices`.
     """
     # Keep track of which face an edge point is coming from.
     edge_points_face_dict: dict[int, int] = {}
@@ -235,7 +231,7 @@ def prepare_edges_and_corner_vertices(
 
         # We orient ourselves relative to the same face for each edge
         if f not in edge_face_dict:
-            face = f.faces[0]  # type: ignore[index]
+            face = f.faces[0]
             edge_face_dict[f] = face
         else:
             face = edge_face_dict[f]
@@ -253,7 +249,7 @@ def prepare_edges_and_corner_vertices(
         else:
             edge_dict[ordered_e].sorted_insert(VertexDistance(i, dist))
 
-        edge_points_face_dict[i] = ordered_e.faces[0]  # type: ignore[index]
+        edge_points_face_dict[i] = ordered_e.faces[0]
 
     # Add edge points (face corners) when they should be included
     for edge, edge_points in edge_dict.items():
@@ -273,32 +269,32 @@ This will give us the following dictionary (simplified here):
 ```py
 {
     (4, 8): [
-        (index=8, distance=0),
-        (index=4, distance=0.075)
+        (index=8,  distance=0),
+        (index=4,  distance=0.075)
     ],
     (1, 8): [        
-        (index=8,distance=0),
-        (index=17,distance=0.042),
-        (index=15,distance=0.046),
-        (index=13,distance=0.056),
+        (index=8,  distance=0),
+        (index=17, distance=0.042),
+        (index=15, distance=0.046),
+        (index=13, distance=0.056),
     ],
     (10, 8): [
-        (index=8, distance=0),
+        (index=8,  distance=0),
         (index=22, distance=0.037)
     ],
     (3, 8): [
-        (index=8, distance=0),
+        (index=8,  distance=0),
         (index=29, distance=0.022)
     ],
     (5, 8): [
-        (index=8, distance=0),
+        (index=8,  distance=0),
         (index=31, distance=0.034)
     ],
 } 
 ```
 
 To give a bit more detail on the last for loop; here we decide per edge whether a face vertex should be included as a part of our new shapes. By face vertices I mean vertices that make up the faces of the base shape: the icosahedron.
-We can already see that in this case vertex 8 should be included, as it's a vertex of 5 of our new shapes (all except the green one in our image).
+We can already see that in this case vertex `8` should be included, as it's a vertex of `5` of our new shapes (all except the green one in our image).
 All the other face vertices of the edges we cross are not included (e.g. 4 and 1, they are off screen but we can see them in the dictionary).
 
 To decide which face vertices should be included we can make use of the fact that the country borders are all defined clockwise. Imagine you're walking along the border in an anticlockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
@@ -313,11 +309,16 @@ The following pseudo-code describes how we will end up with our newly defined sh
 new_shapes = []
 new_shape = []
 edge_vertices = [...]
+
 for vertex in border:
+
     if vertex == new_shape[0]:
+        # The loop is complete
         new_shapes.append(new_shape)
+
         if len(edge_vertices) == 0:
             break
+
         new_shape = []
         vertex = edge_vertices[0]
     new_shape.append(vertex)
@@ -335,9 +336,15 @@ for vertex in border:
 Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D. 
 We apply the algorithm, transform back into 3D and that's it!
 
-Doing this for every single country means our project is complete! Though the wireframe does look very messy.
+Doing this for every single country means our project is complete! 
 
 ![uganda-triangles](images/uganda-triangles.jpg "A triangulated Uganda") ![triangulated-earth](images/triangulated-earth.jpg "The whole world, completely triangulated")
+
+## Based on what?
+
+We can choose other shapes than the icosahedron. [[different-bases]] shows a few different ones. Unfortunately, it's not possible to use just any shape due to the projection that is used. Since all spherical points are projected towards the center, it's expected that there will be something to project onto. A torus which has a hole in the middle will not be able to acommodate points projected from the North and South Pole.
+
+![different-bases](images/different-bases.jpg "All sorts of different Earth shapes, using different shapes as the base")
 
 ## Conclusion
 

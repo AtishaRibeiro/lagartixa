@@ -57,7 +57,9 @@ def syntax_highlighting(soup: BeautifulSoup):
         block.append(parsed)
 
 
-def image_titles(soup: BeautifulSoup):
+def process_figures(soup: BeautifulSoup):
+    """Process images and videos"""
+
     img_counter = 1
     img_dict = {}
 
@@ -65,25 +67,38 @@ def image_titles(soup: BeautifulSoup):
         if img.get("id") == "site-logo":
             continue
 
-        img_id = pathlib.Path(img["src"]).stem.replace(" ", "-")
+        img_src = pathlib.Path(img["src"])
+        img_title = img.get("title")
+        img_id = img_src.stem.replace(" ", "-")
         img_dict[img_id] = f"Figure {img_counter}"
 
+        if img_src.suffix == ".webm":
+            class_prefix = "video-"
+            img.name = "video controls"
+            img.attrs = {}
+            video = soup.new_tag(
+                "source", attrs={"src": img_src, "type": f"video/{img_src.suffix[1:]}" }
+            )
+            img.append(video)
+        else:
+            class_prefix = "img-"
+
         # Wrap img in a div
-        div = soup.new_tag("div", attrs={"class": "img-div"})
+        div = soup.new_tag("div", attrs={"class": f"{class_prefix}div"})
         img.parent.insert(img.parent.contents.index(img), div)
         div.append(img)
 
         # Change parent <p> to a <div>
         div.parent.name = "div"
-        div.parent["class"] = "img-root"
+        div.parent["class"] = f"{class_prefix}root"
 
-        if title := img.get("title"):
-            title = f"<b>Figure {img_counter}:</b> {title}"
+        if img_title:
+            title = f"<b>Figure {img_counter}:</b> {img_title}"
         else:
             title = f"<b>Figure {img_counter}</b>"
 
         title_soup = BeautifulSoup(title, "html.parser")
-        title = soup.new_tag("p", attrs={"class": "img-title"})
+        title = soup.new_tag("p", attrs={"class": f"{class_prefix}title"})
         title.append(title_soup)
         img.insert_after(title)
 
@@ -95,6 +110,9 @@ def image_titles(soup: BeautifulSoup):
         if match := set(img_link_regex.findall(text_node)):
             new_text = text_node
             for m in match:
+                if m not in img_dict:
+                    continue
+
                 to_replace = f"[[{m}]]"
                 figure_ref = f"<i>{img_dict[m]}</i>"
                 new_text = new_text.replace(to_replace, figure_ref)
@@ -120,7 +138,8 @@ def process_html(html: str, dir: str, pretty: bool = False) -> None:
 
     anchor_headers(new_soup)
     syntax_highlighting(new_soup)
-    image_titles(new_soup)
+    process_figures(new_soup)
+    # process_videos(new_soup)
 
     if pretty:
         return new_soup.prettify()
