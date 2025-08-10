@@ -142,7 +142,7 @@ def generate_post_html(name: str) -> None:
 
     rel_dir = get_relative_dir_offset(post_dir)
     css = os.path.join(rel_dir, "static", "main.css")
-    post_rendered = base_template.render(contents=str(html), styles=[css])
+    post_rendered = base_template.render(contents=str(html), styles=[css], _class="centered-column")
 
     html_path = os.path.join(post_dir, f"{name}.html")
     with open(html_path, "w") as f:
@@ -160,7 +160,7 @@ def generate_videos_html() -> None:
     for video in videos:
         video["url"] = "https://youtube.com/embed/" + video["url"].split("/")[-1]
 
-    videos_rendered = videos_template.render(videos=videos)
+    videos_rendered = videos_template.render(videos=videos * 2)
 
     page_rendered = base_template.render(
         contents=videos_rendered,

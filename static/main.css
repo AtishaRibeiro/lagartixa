@@ -16,14 +16,17 @@
 }
 
 body {
-  max-width: clamp(5vw, 50rem, 90vw);
-  margin: 0 auto;
   /* center */
   background: #F6F6F6;
   color: #0D0D0D;
   font-family: roboto;
   font-size: 19;
   text-align: justify;
+}
+
+.centered-column {
+  max-width: clamp(5vw, 50rem, 90vw);
+  margin: 0 auto;
 }
 
 #site-logo {
