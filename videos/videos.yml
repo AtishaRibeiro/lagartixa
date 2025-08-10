@@ -1,4 +1,12 @@
+- name: Real Lies - LOVERWORLD (Lyric Video) 
+  name-link: loverworld
+  description: A dreamy lyric video for my favourite song on the WWAOE album.
+  youtube-description: Love floating text in a never changing sky
+  uploaded: 2025-08-08
+  url: https://youtu.be/yXTzYa2w4QY
+  thumbnail: LOVERWORLD.png
 - name: Bald and Bankrupt in the former USSR 
+  name-link: ussr
   description: A compilation of all the places the youtuber Bald and Bankrupt visited in the former USSR.
   youtube-description: |
     Dedicated to the people, cultures and languages of the former Soviet Union.
@@ -23,6 +31,7 @@
   thumbnail: ussr.jpg
   notes: Originally uploaded on 2025-03-30 but it turned out I forgot to hightlight Latvia as part of the USSR in the intro, so I fixed it and reuploaded.
 - name: Prognoz Visualiser 
+  name-link: prognoz
   description: A visualiser for Molchat Doma's Prognoz. Including lyrics. 
   youtube-description: спасибо молчат дома
   uploaded: 2024-09-15

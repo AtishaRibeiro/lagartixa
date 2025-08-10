@@ -1,13 +1,15 @@
 <div id="video-container">
   {% for video in videos %}
-  <div class="video-card">
-    <img src="videos/{{ video.thumbnail }}" />
-    <div class="video-info">
-      <p class="video-title">{{ video.name }}</p>
+  <a href="videos/{{ video.name_link }}.html" class="video-link">
+    <div class="video-card">
+      <div style="background: url('videos/{{ video.thumbnail }}') center/cover no-repeat" class="video-bg">
+      </div>
       <p class="video-date">{{ video.uploaded }}</p>
+      <p class="video-title">{{ video.name }}</p>
+      <img class="video-thumb" src="videos/{{ video.thumbnail }}" />
       <p class="video-description">{{ video.description }}</p>
     </div>
-  </div>
+  </a>
 
   {% endfor %}
 </div>
