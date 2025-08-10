@@ -1,14 +1,17 @@
 <!DOCTYPE html>
 <html lang="{{ language }}">
+
 <head>
-{% for style in styles%}
-  <link rel="stylesheet" href="{{style}}">
-{% endfor %}
+  {% for style in styles%}
+  <link rel="stylesheet" href="{{ root_path }}/{{ style }}">
+  {% endfor %}
 </head>
+
 <body>
   {% include "header.html" %}
   <div class="{{ _class }}">
     {{ contents }}
   </div>
 </body>
+
 </html>

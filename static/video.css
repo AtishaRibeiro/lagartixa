@@ -1,0 +1,21 @@
+.iframe-wrapper {
+  display: flex;
+  justify-content: center;
+}
+
+iframe {
+  display: block;
+}
+
+.video-date {
+  font-size: 24px;
+  font-weight: bold;
+}
+
+
+.video-notes {
+  background: rgb(200, 250, 255);
+  color: rgb(67, 92, 217);
+  padding: 10px;
+  border-radius: 10px;
+}

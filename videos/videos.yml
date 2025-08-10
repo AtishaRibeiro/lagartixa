@@ -1,13 +1,15 @@
 - name: Real Lies - LOVERWORLD (Lyric Video) 
   name-link: loverworld
-  description: A dreamy lyric video for my favourite song on the WWAOE album.
+  description-short: A dreamy lyric video for my favourite song on the WWAOE album.
+  description: I've been listening non-stop to the WWAOE album from Real Lies, and this specific song just stuck out; A continuous stream of words that is just begging for a lyric video. This took only 4 evenings to make, a welcome change from the 4 months the last video took.
   youtube-description: Love floating text in a never changing sky
   uploaded: 2025-08-08
   url: https://youtu.be/yXTzYa2w4QY
   thumbnail: LOVERWORLD.png
 - name: Bald and Bankrupt in the former USSR 
   name-link: ussr
-  description: A compilation of all the places the youtuber Bald and Bankrupt visited in the former USSR.
+  description-short: A compilation of all the places the youtuber Bald and Bankrupt visited in the former USSR.
+  description: I discovered Bald's channel in 2019. His videos gave me insight into a world that was barely known to me at the time, kickstarted my love for the russian language, and in turn for russian music. For the longest time I wanted to map out all the places he'd been to, and finally decided to go for it. In total 2 months was spent on just creating the visuals (mainly the 3D globe) and another 2 months going through his videos and finding all locations he went to. Some locations were easy, others took some real geoguessr detective work. 
   youtube-description: |
     Dedicated to the people, cultures and languages of the former Soviet Union.
 
@@ -32,7 +34,8 @@
   notes: Originally uploaded on 2025-03-30 but it turned out I forgot to hightlight Latvia as part of the USSR in the intro, so I fixed it and reuploaded.
 - name: Prognoz Visualiser 
   name-link: prognoz
-  description: A visualiser for Molchat Doma's Prognoz. Including lyrics. 
+  description-short: A visualiser for Molchat Doma's Prognoz. Including lyrics. 
+  description: My first ever music visualiser, driven by a long-standing obsession with visually syncing things to sound. I'm no Blender artist, but the Hotel Panorama is simple enough in style to give it a shot.
   youtube-description: спасибо молчат дома
   uploaded: 2024-09-15
   url: https://youtu.be/kZWvIx-0sA8

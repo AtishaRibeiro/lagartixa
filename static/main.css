@@ -73,7 +73,8 @@ img {
   margin: auto;
 }
 
-.img-title, .video-title {
+.img-title,
+.video-title {
   text-align: center;
   font-size: 17px;
   font-style: italic;

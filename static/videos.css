@@ -13,7 +13,7 @@ img {
 
   margin-top: 50px;
   row-gap: 20px;
-
+  column-gap: 20px;
 }
 
 .video-card {

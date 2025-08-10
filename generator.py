@@ -151,6 +151,27 @@ def generate_post_html(name: str) -> None:
         f.write(post_rendered)
 
 
+def generate_video_html(video: dict) -> None:
+    env = Environment(loader=FileSystemLoader("templates"))
+    base_template = env.get_template("base.html")
+    video_template = env.get_template("video.html")
+
+    videos_dir = "videos"
+    rel_dir = get_relative_dir_offset(videos_dir)
+
+    video_rendered = video_template.render(video=video)
+    post_rendered = base_template.render(
+        contents=video_rendered,
+        styles=["static/main.css", "static/video.css"],
+        _class="centered-column",
+        root_path=rel_dir,
+    )
+
+    html_path = os.path.join(videos_dir, f"{video["name_link"]}.html")
+    with open(html_path, "w") as f:
+        f.write(post_rendered)
+
+
 def generate_videos_html() -> None:
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
@@ -160,12 +181,16 @@ def generate_videos_html() -> None:
         videos = yaml.safe_load(f)
 
     for video in videos:
-        video["url"] = "https://youtube.com/embed/" + video["url"].split("/")[-1]
+        video["url"] = (
+            f"https://youtube.com/embed/{video["url"].split("/")[-1]}?vq=hd720p"
+        )
 
         keys = list(video)
         for key in keys:
             # Jinja doesn't like dashes
             video[key.replace("-", "_")] = video.pop(key)
+
+        generate_video_html(video)
 
     videos_rendered = videos_template.render(videos=videos)
 
@@ -188,7 +213,10 @@ def generate_simple_html(template: str, destination: str) -> None:
         html = f.read()
 
     page_rendered = base_template.render(
-        contents=str(html), styles=["static/main.css"], root_path="."
+        contents=str(html),
+        styles=["static/main.css"],
+        _class="centered-column",
+        root_path=".",
     )
 
     with open(f"{destination}.html", "w") as f:
