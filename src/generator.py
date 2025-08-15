@@ -9,6 +9,18 @@ from pygments.formatters import HtmlFormatter
 import re
 import yaml
 
+ROOT_PATH = pathlib.Path(__file__).parent.parent
+
+
+def root(func):
+    def wrapper():
+        cwd = os.getcwd()
+        os.chdir(ROOT_PATH)
+        func()
+        os.chdir(cwd)
+
+    return wrapper
+
 
 def get_header(rel_dir: str) -> BeautifulSoup:
     with open("templates/header.html", "r") as f:
@@ -223,6 +235,7 @@ def generate_simple_html(template: str, destination: str) -> None:
         f.write(page_rendered)
 
 
+@root
 def main():
     generate_post_html("globe")
     generate_videos_html()

@@ -29,11 +29,6 @@ body {
   margin: 0 auto;
 }
 
-#site-logo {
-  display: block;
-  margin: auto;
-}
-
 h1 {
   font-family: merri;
   font-size: 40;
@@ -47,6 +42,11 @@ h2 {
 
 img {
   mix-blend-mode: darken;
+}
+
+.center-img {
+  display: block;
+  margin: auto;
 }
 
 .img-root {
