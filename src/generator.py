@@ -236,7 +236,7 @@ def generate_simple_html(template: str, destination: str) -> None:
 
 
 @root
-def main():
+def generate():
     generate_post_html("globe")
     generate_videos_html()
     generate_simple_html("home", "index")
@@ -244,4 +244,4 @@ def main():
 
 
 if __name__ == "__main__":
-    main()
+    generate()
