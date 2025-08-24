@@ -1,5 +1,9 @@
 # Krita artifacts
 *~
 *kra-autosave.kra
+
 *webm\.log
 *.DS_Store
+
+__pycache__/
+*.pyc

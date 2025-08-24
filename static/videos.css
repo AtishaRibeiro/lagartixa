@@ -11,7 +11,6 @@ img {
   justify-content: space-evenly;
   align-items: stretch;
 
-  margin-top: 50px;
   row-gap: 20px;
   column-gap: 20px;
 }
@@ -23,12 +22,9 @@ img {
   border-radius: 8px;
   overflow: hidden;
   position: relative;
-  /* padding: 20px; */
-  /* padding-top: 10px; */
   padding-left: 20px;
   padding-right: 20px;
   width: 400px;
-  /* max-width: 400px; */
 
   display: grid;
   /* grid-template-columns: 1fr; */

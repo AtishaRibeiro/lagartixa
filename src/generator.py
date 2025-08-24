@@ -270,9 +270,14 @@ def generate_simple_html(template: str, destination: str) -> None:
     with open(f"templates/{template}.html", "r") as f:
         html = f.read()
 
+    styles = ["static/main.css"]
+    specific_css = f"static/{template}.css"
+    if pathlib.Path(specific_css).exists():
+        styles.append(specific_css)
+
     page_rendered = base_template.render(
         contents=str(html),
-        styles=["static/main.css"],
+        styles=styles,
         _class="centered-column",
         root_path=".",
     )
@@ -286,7 +291,6 @@ def generate():
     generate_videos_html()
     generate_simple_html("home", "index")
     generate_simple_html("about", "about")
-    generate_simple_html("posts", "posts")
     generate_posts_html()
 
 

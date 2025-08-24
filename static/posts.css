@@ -1,3 +1,53 @@
 img {
   mix-blend-mode: normal;
 }
+
+.post-link {
+  display: contents;
+  text-decoration: none;
+  color: inherit;
+}
+
+.post-title {
+  font-size: 20px;
+  font-weight: bold;
+  margin-top: 40px;
+}
+
+.post-card {
+  border-style: solid;
+  border-width: 3px;
+  border-color: rgb(0, 0, 30);
+  border-radius: 8px;
+  overflow: hidden;
+  position: relative;
+  padding-left: 20px;
+  padding-right: 20px;
+}
+
+.post-date {
+  font-weight: bold;
+  font-style: italic;
+
+  position: absolute;
+  display: inline-block;
+  width: auto;
+  top: -6px;
+  left: -6px;
+  margin-top: 0;
+  padding: 2px;
+  padding-left: 6px;
+  padding-right: 5px;
+
+  background: white;
+
+  border-style: solid;
+  border-width: 3px;
+  border-color: rgb(0, 0, 30);
+  border-radius: 8px;
+}
+
+.post-card:hover {  
+  cursor: pointer;
+  background-color: honeydew;
+}
