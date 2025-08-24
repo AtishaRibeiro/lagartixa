@@ -179,6 +179,7 @@ def generate_posts_html() -> None:
                 print(
                     f"Skipping post '{entry.name}' because it doesn't have info.yml or text.md"
                 )
+                continue
 
             with open(info_file, "r") as f:
                 info = yaml.safe_load(f)
@@ -288,9 +289,9 @@ def generate_simple_html(template: str, destination: str) -> None:
 
 @root
 def generate():
-    generate_videos_html()
     generate_simple_html("home", "index")
     generate_simple_html("about", "about")
+    generate_videos_html()
     generate_posts_html()
 
 

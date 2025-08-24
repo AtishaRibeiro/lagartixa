@@ -23,6 +23,8 @@ img {
   position: relative;
   padding-left: 20px;
   padding-right: 20px;
+  background-color: white;
+  filter: drop-shadow(0 0 0.1rem gray);
 }
 
 .post-date {
@@ -50,4 +52,5 @@ img {
 .post-card:hover {  
   cursor: pointer;
   background-color: honeydew;
+  filter: drop-shadow(0 0 0 gray);
 }

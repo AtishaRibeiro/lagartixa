@@ -1,8 +1,8 @@
 # Turning the globe into a 3D mesh
 
-I was working on [a video](https://youtu.be/GxhLSzhGFWo?feature=shared) where I needed to visualise various locations across the former Soviet Union. 
+I was working on [a video](/videos/ussr) where I needed to visualise various locations across the former Soviet Union. 
 The requirements were pretty straightforward:
-1. Country border
+1. Country borders
 1. Region borders (states, provinces, ...)
 1. Looks nice when zoomed in
 1. No distortion
