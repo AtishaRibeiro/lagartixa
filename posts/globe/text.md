@@ -173,7 +173,7 @@ def connect_2_points(A, B):
 
 Once all points are on neighbouring triangles we can apply algorithm one again.
 
-![crossing-zoom](animations/cross-connecting.webm "A happy Nepal")
+![crossing-zoom](animations/cross-connecting.webm "Connecting points across faces")
 
 ![crossing-zoom](images/edge-crossing-zoom-good.jpg "A happy Nepal")
 

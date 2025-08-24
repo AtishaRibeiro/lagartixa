@@ -74,7 +74,7 @@ def syntax_highlighting(soup: BeautifulSoup) -> None:
         block.append(parsed)
 
 
-def process_figures(soup: BeautifulSoup) -> None:
+def process_figures(soup: BeautifulSoup, dir: str) -> None:
     """Process images and videos"""
 
     img_counter = 1
@@ -84,7 +84,8 @@ def process_figures(soup: BeautifulSoup) -> None:
         if img.get("id") == "site-logo":
             continue
 
-        img_src = pathlib.Path(img["src"])
+        img_src = pathlib.Path("/", dir, img["src"])
+        img["src"] = img_src
         img_title = img.get("title")
         img_id = img_src.stem.replace(" ", "-")
         img_dict[img_id] = f"Figure {img_counter}"
@@ -147,7 +148,7 @@ def generate_post_html(name: str) -> None:
 
     anchor_headers(html)
     syntax_highlighting(html)
-    process_figures(html)
+    process_figures(html, post_dir)
 
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
@@ -158,9 +159,53 @@ def generate_post_html(name: str) -> None:
         contents=str(html), styles=[css], _class="centered-column", root_path=rel_dir
     )
 
-    html_path = os.path.join(post_dir, f"{name}.html")
+    html_path = os.path.join(post_dir, "index.html")
     with open(html_path, "w") as f:
         f.write(post_rendered)
+
+
+def generate_posts_html() -> None:
+    posts = []
+    with os.scandir("posts") as it:
+        for entry in it:
+            if not entry.is_dir():
+                continue
+
+            root = pathlib.Path(entry.path)
+            info_file = root / "info.yml"
+            text_file = root / "text.md"
+
+            if not info_file.exists() or not text_file.exists():
+                print(
+                    f"Skipping post '{entry.name}' because it doesn't have info.yml or text.md"
+                )
+
+            with open(info_file, "r") as f:
+                info = yaml.safe_load(f)
+
+            info["name"] = root.name
+            posts.append(info)
+
+    posts = [x for x in posts if x["published"]]
+    posts.sort(key=lambda post: post["date"])
+    print(posts)
+
+    for post in posts:
+        generate_post_html(post["name"])
+
+    env = Environment(loader=FileSystemLoader("templates"))
+    base_template = env.get_template("base.html")
+    posts_template = env.get_template("posts.html")
+
+    posts_rendered = posts_template.render(posts=posts)
+    page_rendered = base_template.render(
+        contents=posts_rendered,
+        styles=["static/main.css", "static/posts.css"],
+        root_path=".",
+    )
+
+    with open("posts.html", "w") as f:
+        f.write(page_rendered)
 
 
 def generate_video_html(video: dict) -> None:
@@ -217,7 +262,8 @@ def generate_videos_html() -> None:
 
 
 def generate_simple_html(template: str, destination: str) -> None:
-    """For simple pages with content that fit in base.html without any extra processing"""
+    """For simple pages with content that fit in base.html without
+    any extra processing"""
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
 
@@ -237,10 +283,11 @@ def generate_simple_html(template: str, destination: str) -> None:
 
 @root
 def generate():
-    generate_post_html("globe")
     generate_videos_html()
     generate_simple_html("home", "index")
     generate_simple_html("about", "about")
+    generate_simple_html("posts", "posts")
+    generate_posts_html()
 
 
 if __name__ == "__main__":

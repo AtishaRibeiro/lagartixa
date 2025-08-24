@@ -11,11 +11,12 @@
   <div id="header" class="centered-column">
   <div>
     <a class="right" href="../../index">Home</a>
-    <a class="right" href="../../videos">Videos</a>
+    <a class="right" href="../../posts">Posts</a>
   </div>
   <img id="site-logo" class="center-img" src="../../static/base-logo-smile.png" alt="beautiful site logo"
     width="200" />
   <div>
+    <a class="left" href="../../videos">Videos</a>
     <a class="left" href="../../about">About</a>
   </div>
 </div>
@@ -61,7 +62,7 @@ This includes the country and region borders that we need.</p>
 </code>
 <p>The result is a list of (lat, lon) coordinates that describe the border of the country/region.
 As an example, Luxembourg in 1:110M scale consists of only 6 coordinates (points).</p>
-<div class="img-root"><div class="img-div"><img alt="luxembourg outline" src="images/luxembourg.png" title="Luxembourg"/><p class="img-title"><b>Figure 1:</b> Luxembourg</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="luxembourg outline" src="/posts/globe/images/luxembourg.png" title="Luxembourg"/><p class="img-title"><b>Figure 1:</b> Luxembourg</p></div></div>
 <p>In Natural Earth's dataset all borders/shapes are described in a clockwise order, which is something that will come in handy later on! My code is based on it being
 anticlockwise, but all that means is that we have to reverse the data.</p>
 <h2 id="placing-coordinates-in-3d-space">Placing coordinates in 3D space</h2>
@@ -84,14 +85,14 @@ The following function transforms a coordinate into a point in 3D space on a sph
 </pre></div>
 </code>
 <p>If we then write all of these 3D points to an <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file">.OBJ</a> file and connect them using <a href="https://en.wikipedia.org/wiki/Wavefront_.obj_file#Line_elements">lines</a> we get the result in <i>Figure 2</i>. From a distance this looks good, but if we overlay this on a spherical object we see some strange artefacts seen in <i>Figure 3</i>.</p>
-<div class="img-root"><div class="img-div"><img alt="perfect lines" src="images/perfect-lines.jpg" title="Country borders"/><p class="img-title"><b>Figure 2:</b> Country borders</p></div> <div class="img-div"><img alt="faulty lines" src="images/faulty-lines.jpg" title="Country borders overlayed on a sphere"/><p class="img-title"><b>Figure 3:</b> Country borders overlayed on a sphere</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="perfect lines" src="/posts/globe/images/perfect-lines.jpg" title="Country borders"/><p class="img-title"><b>Figure 2:</b> Country borders</p></div> <div class="img-div"><img alt="faulty lines" src="/posts/globe/images/faulty-lines.jpg" title="Country borders overlayed on a sphere"/><p class="img-title"><b>Figure 3:</b> Country borders overlayed on a sphere</p></div></div>
 <p>It looks like our lines are going straight through the sphere! While our points do lie on the surface, the lines are just that: straight lines, meaning they don't follow the sphere's surface.
 We will need to come up with a solution to make the lines live on the surface.</p>
-<div class="img-root"><div class="img-div"><img alt="slice-lines" src="images/slice-lines.jpg" title="Lines cutting through the sphere"/><p class="img-title"><b>Figure 4:</b> Lines cutting through the sphere</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="slice-lines" src="/posts/globe/images/slice-lines.jpg" title="Lines cutting through the sphere"/><p class="img-title"><b>Figure 4:</b> Lines cutting through the sphere</p></div></div>
 <h2 id="journey-to-the-center-of-the-earth">Journey to the center of the Earth</h2>
 <p>So far we've been working with a perfect sphere. 3D meshes are made up of flat triangles and non-curved lines. Spheres on the other hand are famous for being very round and not having any flat surfaces; not a great combination.
 This means that any spherical mesh is just an approximation of the real thing. The more triangles we use, the closer we get to an actual sphere.</p>
-<div class="img-root"><div class="img-div"><img alt="3icos" src="images/3icos-numbers.jpg" title="Different icosahedron resolutions"/><p class="img-title"><b>Figure 5:</b> Different icosahedron resolutions</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="3icos" src="/posts/globe/images/3icos-numbers.jpg" title="Different icosahedron resolutions"/><p class="img-title"><b>Figure 5:</b> Different icosahedron resolutions</p></div></div>
 <p>We will continue for now with a low res icosahedron (number 1 in <i>Figure 5</i>) as it's easier to visualise what is going on. You'll see later that we can use all sorts of shapes as a base!</p>
 <p>In order to connect our points with straight lines that seemingly lie on a sphere we will have to use one of these approximations as our base and so our points need to lie on this base.
 The easiest is to project all our points towards the center of the sphere, and create the projected point on the intersection with our base. This is the method I ended up using.</p>
@@ -105,10 +106,10 @@ The easiest is to project all our points towards the center of the sphere, and c
 </pre></div>
 </code>
 <p>Now all our points live on this spherical approximation, consisting of triangles.</p>
-<div class="img-root"><div class="img-div"><img alt="ico-projection" src="images/ico-projection.jpg" title="Projecting a spherical point onto our base"/><p class="img-title"><b>Figure 6:</b> Projecting a spherical point onto our base</p></div> <div class="img-div"><img alt="ico-projection-globe" src="images/ico-project-globe.png" title="All countries projected"/><p class="img-title"><b>Figure 7:</b> All countries projected</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="ico-projection" src="/posts/globe/images/ico-projection.jpg" title="Projecting a spherical point onto our base"/><p class="img-title"><b>Figure 6:</b> Projecting a spherical point onto our base</p></div> <div class="img-div"><img alt="ico-projection-globe" src="/posts/globe/images/ico-project-globe.png" title="All countries projected"/><p class="img-title"><b>Figure 7:</b> All countries projected</p></div></div>
 <h2 id="connecting-the-dots">Connecting the dots</h2>
 <p>Wait a second, let's zoom in a bit around the edges of our icosahedron ... that doesn't look right, it seems we are losing some of our outlines again.</p>
-<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="images/edge-crossing-zoom-bad.jpg" title="Nepal cutting through the icosahedron's edge"/><p class="img-title"><b>Figure 8:</b> Nepal cutting through the icosahedron's edge</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="/posts/globe/images/edge-crossing-zoom-bad.jpg" title="Nepal cutting through the icosahedron's edge"/><p class="img-title"><b>Figure 8:</b> Nepal cutting through the icosahedron's edge</p></div></div>
 <p>Whenever all points lie on a single triangle there is no issue, but when 2 connected points lie on different triangles we have the same problem as before where the line goes through the surface.
 If we name these 2 "problematic" points <strong>A</strong> and <strong>B</strong>, then we want to transform line <strong>AB</strong> so that it follows the surface.
 In order to do that we just split up <strong>AB</strong> into 2 separate lines <strong>AE</strong> and <strong>EB</strong> where <strong>E</strong> is a point on the edge <strong>e</strong> that the 2 triangles have in common. This way <strong>AE</strong> lies completely on the same triangle <strong>A</strong> lives on, and the same goes for <strong>EB</strong> and <strong>B</strong>.</p>
@@ -132,7 +133,7 @@ There might be a cool formula for this, but I went with an iterative approach:</
 <span class="k">return</span> <span class="n">Y</span>
 </pre></div>
 </code>
-<div class="video-root"><div class="video-div"><video controls><source src="animations/connecting.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 9:</b> Iteratively finding the shortest path between 2 points on adjacent faces</p></div></div>
+<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/connecting.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 9:</b> Iteratively finding the shortest path between 2 points on adjacent faces</p></div></div>
 <h3 id="crossing-multiple-triangles">Crossing multiple triangles</h3>
 <p>Some connected points lie on triangles that don't border each other. In that case we will have to do the above algorithm a few times for each triangle inbetween.
 To decide what triangles lie in the middle we do the following:</p>
@@ -156,8 +157,8 @@ To decide what triangles lie in the middle we do the following:</p>
 </pre></div>
 </code>
 <p>Once all points are on neighbouring triangles we can apply algorithm one again.</p>
-<div class="video-root"><div class="video-div"><video controls><source src="animations/cross-connecting.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 10:</b> A happy Nepal</p></div></div>
-<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="images/edge-crossing-zoom-good.jpg" title="A happy Nepal"/><p class="img-title"><b>Figure 11:</b> A happy Nepal</p></div></div>
+<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/cross-connecting.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 10:</b> Connecting points across faces</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="crossing-zoom" src="/posts/globe/images/edge-crossing-zoom-good.jpg" title="A happy Nepal"/><p class="img-title"><b>Figure 11:</b> A happy Nepal</p></div></div>
 <p>That looks pretty good already! In fact it satisfies all of our requrements except 1.</p>
 <ul>
 <li>We can add region borders the same way as we did country borders.</li>
@@ -178,7 +179,7 @@ This will allow us to divide our shapes (countries) into individual triangles th
 <h3 id="redraw-the-borders">Redraw the borders</h3>
 <p>For point <code>2.</code> I'll use Uganda as an example, as one of the icosahedron's points lies nicely in the middle.
 The end goal is to split the country up into 6 parts, that each lie completely on one the icosahedron's triangles.</p>
-<div class="img-root"><div class="img-div"><img alt="uganda-sections" src="images/uganda-sections.jpg" title="Uganda divided into 6 completely flat shapes"/><p class="img-title"><b>Figure 12:</b> Uganda divided into 6 completely flat shapes</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="uganda-sections" src="/posts/globe/images/uganda-sections.jpg" title="Uganda divided into 6 completely flat shapes"/><p class="img-title"><b>Figure 12:</b> Uganda divided into 6 completely flat shapes</p></div></div>
 <p>In a first pass, we will collect all points per edge and sort them </p>
 <code class="language-py"><div class="highlight"><pre><span></span><span class="k">def</span><span class="w"> </span><span class="nf">prepare_edges_and_corner_vertices</span><span class="p">(</span>
     <span class="n">vertices</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="n">np</span><span class="o">.</span><span class="n">ndarray</span><span class="p">],</span> <span class="n">faces</span><span class="p">:</span> <span class="nb">list</span><span class="p">[</span><span class="nb">int</span> <span class="o">|</span> <span class="n">EdgeI</span><span class="p">],</span> <span class="n">mesh</span>
@@ -272,7 +273,7 @@ We can already see that in this case vertex <code>8</code> should be included, a
 All the other face vertices of the edges we cross are not included (e.g. 4 and 1, they are off screen but we can see them in the dictionary).</p>
 <p>To decide which face vertices should be included we can make use of the fact that the country borders are all defined clockwise. Imagine you're walking along the border in an anticlockwise manner; if while crossing an edge the first vertex to the left of you is a face vertex, it will be part of your new shape. It's that simple.
 If for example vertex 15 went straight back to vertex 4 and closed the country border that way, then the closest vertex left of 15 is 13, which is not a face vertex. As such 8 will never be included.</p>
-<div class="img-root"><div class="img-div"><img alt="uganda-numbered" src="images/uganda-numbered.jpg" title="All edge vertices numbered (including the face vertex)"/><p class="img-title"><b>Figure 13:</b> All edge vertices numbered (including the face vertex)</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="uganda-numbered" src="/posts/globe/images/uganda-numbered.jpg" title="All edge vertices numbered (including the face vertex)"/><p class="img-title"><b>Figure 13:</b> All edge vertices numbered (including the face vertex)</p></div></div>
 <p>Using this dictionary, we can construct our new shapes. We go over our border in an anticlockwise manner again and every time we are about to leave a face, we instead connect to the closest vertex to the left of us.
 The following pseudo-code describes how we will end up with our newly defined shapes:</p>
 <code class="language-py"><div class="highlight"><pre><span></span><span class="n">new_shapes</span> <span class="o">=</span> <span class="p">[]</span>
@@ -303,10 +304,10 @@ The following pseudo-code describes how we will end up with our newly defined sh
 <p>Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D.
 We apply the algorithm, transform back into 3D and that's it!</p>
 <p>Doing this for every single country means our project is complete! </p>
-<div class="img-root"><div class="img-div"><img alt="uganda-triangles" src="images/uganda-triangles.jpg" title="A triangulated Uganda"/><p class="img-title"><b>Figure 14:</b> A triangulated Uganda</p></div> <div class="img-div"><img alt="triangulated-earth" src="images/triangulated-earth.jpg" title="The whole world, completely triangulated"/><p class="img-title"><b>Figure 15:</b> The whole world, completely triangulated</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="uganda-triangles" src="/posts/globe/images/uganda-triangles.jpg" title="A triangulated Uganda"/><p class="img-title"><b>Figure 14:</b> A triangulated Uganda</p></div> <div class="img-div"><img alt="triangulated-earth" src="/posts/globe/images/triangulated-earth.jpg" title="The whole world, completely triangulated"/><p class="img-title"><b>Figure 15:</b> The whole world, completely triangulated</p></div></div>
 <h2 id="based-on-what?">Based on what?</h2>
 <p>We can choose other shapes than the icosahedron. <i>Figure 16</i> shows a few different ones. Unfortunately, it's not possible to use just any shape due to the projection that is used. Since all spherical points are projected towards the center, it's expected that there will be something to project onto. A torus which has a hole in the middle will not be able to acommodate points projected from the North and South Pole.</p>
-<div class="img-root"><div class="img-div"><img alt="different-bases" src="images/different-bases.jpg" title="All sorts of different Earth shapes, using different shapes as the base"/><p class="img-title"><b>Figure 16:</b> All sorts of different Earth shapes, using different shapes as the base</p></div></div>
+<div class="img-root"><div class="img-div"><img alt="different-bases" src="/posts/globe/images/different-bases.jpg" title="All sorts of different Earth shapes, using different shapes as the base"/><p class="img-title"><b>Figure 16:</b> All sorts of different Earth shapes, using different shapes as the base</p></div></div>
 <h2 id="conclusion">Conclusion</h2>
 <p>Phew, what a journey.</p>
 <p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.

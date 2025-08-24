@@ -1,0 +1,12 @@
+<div id="post-container">
+
+  {% for post in posts %}
+  <a href="posts/{{ post.name }}" class="post-link">
+    <div class="video-card">
+      <p class="post-date">{{ post.date }}</p>
+      <p class="post-title">{{ post.title }}</p>
+    </div>
+  </a>
+
+  {% endfor %}
+</div>

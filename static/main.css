@@ -20,7 +20,7 @@ body {
   background: #F6F6F6;
   color: #0D0D0D;
   font-family: roboto;
-  font-size: 19;
+  font-size: 19px;
   text-align: justify;
 }
 
@@ -97,11 +97,11 @@ code:not(:has(> *)) {
   border-radius: 4px;
   padding-left: 3px;
   padding-right: 3px;
-  font-size: 15;
+  font-size: 15px;
 }
 
 code>div>pre {
-  font-size: 12;
+  font-size: 13px;
   overflow-x: scroll;
   color: #8f3f71;
   background: #f0f0f0;
