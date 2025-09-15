@@ -49,7 +49,8 @@ img {
   margin: auto;
 }
 
-.img-root {
+.img-root,
+.video-root {
   display: flex;
   width: 100%;
   gap: 50px;
@@ -59,7 +60,8 @@ img {
   margin-bottom: 50px;
 }
 
-.img-root>div {
+.img-root>div,
+.video-root>div {
   width: 100%;
   display: flex;
   flex-direction: column;
