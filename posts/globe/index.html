@@ -215,10 +215,16 @@ Which one of the two we measure against doesn't matter, as long as we stay consi
 <li>Stay consistent</li>
 <li>Decide whether base corners/vertices (8 in this case) are also part of our shape or not.  </li>
 </ol>
-<p>By traversing the shape in a anticlockwise manner, every time an edge is crossed we can look to our left and see what type of vertex we see first. If it's another vertex that is part of the shape, we just continue. If it's a corner vertex of the base shape (essentially 1 vertex of the edge being crossed) then we can include it.
-<i>Figure 15</i> describes the former, <i>Figure 14</i> the latter.</p>
-<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/corner-in.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 14:</b> Corner should be included in shape</p></div></div>
-<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/corner-out.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 15:</b> Corner should be excluded from shape</p></div></div>
+<p>By traversing the shape in a anticlockwise manner, every time an edge is crossed we can use our sorted list of vertices to "look to our left" and see what type of vertex we see first. If it's another vertex that is part of the shape, we just continue. If it's a corner vertex of the base shape (essentially 1 vertex of the edge being crossed) then we can include it.
+<i>Figure 14</i> describes the former, <i>Figure 15</i> the latter.</p>
+<p>In Uganda's example (<i>Figure 13</i>) we have the following:</p>
+<ul>
+<li>Left of <code>13</code> is <code>15</code></li>
+<li>Left of <code>15</code> is <code>13</code></li>
+<li>Left of <code>17</code> is <code>8</code>: This tells us <code>8</code> is a vertex that needs to be included</li>
+</ul>
+<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/corner-out.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 14:</b> Corner should be excluded from shape</p></div></div>
+<div class="video-root"><div class="video-div"><video controls><source src="/posts/globe/animations/corner-in.webm" type="video/webm"/></video controls><p class="video-title"><b>Figure 15:</b> Corner should be included in shape</p></div></div>
 <p>TODO create the individual shapes.</p>
 <h3 id="chop-up-the-pieces">Chop up the pieces</h3>
 <p>Now that we've divided the country up in smaller shapes that lie completely on a single plane (a triangle of the icosahedron) all that's left is triangulating these shapes. The ear-clipping algorithm mentioned earlier can only be applied in 2D, so we have to transform our 3D shape so it lies flat on the XY plane, essentially turning it 2D.
@@ -232,8 +238,6 @@ We apply the algorithm, transform back into 3D and that's it!</p>
 <p>Phew, what a journey.</p>
 <p>I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar.
 If you're interested, all code is available on <a href="https://github.com/AtishaRibeiro/globe">the github page</a>.</p>
-<p>Enjoy this final result, I think it looks pretty good:
-TODO</p>
 
   </div>
 </body>

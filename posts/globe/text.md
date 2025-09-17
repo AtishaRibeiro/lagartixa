@@ -240,12 +240,17 @@ We always traverse the shape in a anticlockwise order in order to:
 1. Stay consistent
 1. Decide whether base corners/vertices (8 in this case) are also part of our shape or not.  
 
-By traversing the shape in a anticlockwise manner, every time an edge is crossed we can look to our left and see what type of vertex we see first. If it's another vertex that is part of the shape, we just continue. If it's a corner vertex of the base shape (essentially 1 vertex of the edge being crossed) then we can include it.
+By traversing the shape in a anticlockwise manner, every time an edge is crossed we can use our sorted list of vertices to "look to our left" and see what type of vertex we see first. If it's another vertex that is part of the shape, we just continue. If it's a corner vertex of the base shape (essentially 1 vertex of the edge being crossed) then we can include it.
 [[corner-out]] describes the former, [[corner-in]] the latter.
 
-![corner-in](animations/corner-in.webm "Corner should be included in shape")
+In Uganda's example ([[uganda-numbered]]) we have the following:
+* Left of `13` is `15`
+* Left of `15` is `13`
+* Left of `17` is `8`: This tells us `8` is a vertex that needs to be included
 
 ![corner-out](animations/corner-out.webm "Corner should be excluded from shape")
+
+![corner-in](animations/corner-in.webm "Corner should be included in shape")
 
 TODO create the individual shapes.
 
@@ -270,6 +275,3 @@ Phew, what a journey.
 
 I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
 If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe).
-
-Enjoy this final result, I think it looks pretty good:
-TODO
