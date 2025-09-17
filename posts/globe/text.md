@@ -1,3 +1,5 @@
+![mesh-globe](images/mesh.jpg "The globe as a mesh")
+
 # Turning the globe into a 3D mesh
 
 I was working on [a video](/videos/ussr) where I needed to visualise various locations across the former Soviet Union. 
