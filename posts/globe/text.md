@@ -1,4 +1,4 @@
-![mesh-globe](images/mesh.jpg "The globe as a mesh")
+![mesh-globe](images/mesh.jpg)
 
 # Turning the globe into a 3D mesh
 
@@ -18,7 +18,7 @@ The simplest way one might achieve this is by drawing the country borders to som
 In that case we will be dealing with distortions again due to the translation from 2D <-> 3D.
 Additionally, since a texture has a finite resolution, zooming into far means you start seeing the pixels which violates our _"looks nice when zoomed in"_ rule.
 
-Although I can't think of any concrete examples, I have seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technical level.
+Although I can't think of any concrete examples, I *have* seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technical level.
 What to do in that case except come up with your own crazy convoluted solution?
 
 The approach I decided to go with was to turn the globe and all of the countries on it into separate 3D meshes.
@@ -195,7 +195,7 @@ This will allow us to divide our shapes (countries) into individual triangles th
 
 The algorithm is quite simple, but it only works in 2D.
 1. Countries that cover only one triangle of the base are essentially already a 2D shape and the triangle they lie on is "flat". We can thus do a simple transformation where the triangle is transformed so it lays flat on the XY plane, and ignore the Z axis (which will then be 0).
-1. Countries that span multiple triangles of the base will have to be split into segments that each lie completely on a single triangle of the base. Each segment can then be treated like in the first point.
+1. Countries that span multiple triangles of the base will have to be split into segments that each lie completely on a single triangle. Each segment can then be treated as in the first point.
 
 ### Redraw the borders
 
@@ -238,23 +238,18 @@ In [[uganda-numbered]] you can see all vertices that lie on an edge marked by an
 } 
 ```
 
-We always traverse the shape in a anticlockwise order in order to:
-1. Stay consistent
-1. Decide whether base corners/vertices (8 in this case) are also part of our shape or not.  
+Using this dictionary we can traverse the shape in an anticlockwise order and divide it up into smaller segments.
+In [[shaping]] we create a single segment to showcase the algorithm:
+1. Start at an vertex on an edge (`4` in this case)
+1. Keep going until we hit another edge vertex (`13`)
+1. Look "left" of this edge vertex to decide where we continue. To know what lies left we use the dictionary, there we see that vertex `15` is the closest left vertex.
+1. Go to step 2.
 
-By traversing the shape in a anticlockwise manner, every time an edge is crossed we can use our sorted list of vertices to "look to our left" and see what type of vertex we see first. If it's another vertex that is part of the shape, we just continue. If it's a corner vertex of the base shape (essentially 1 vertex of the edge being crossed) then we can include it.
-[[corner-out]] describes the former, [[corner-in]] the latter.
+Because the corners of the base shape are included in the dictionary, they will automatically be picked up by the algorithm in case they need to be part of the segment we are creating, even if they weren't part of the original shape. `8` for example is not part of the Uganda outline, but it is needed to create 5 out of the 6 segments we need.
 
-In Uganda's example ([[uganda-numbered]]) we have the following:
-* Left of `13` is `15`
-* Left of `15` is `13`
-* Left of `17` is `8`: This tells us `8` is a vertex that needs to be included
+We repeat the algorithm for every edge vertex until we have all segments. You'll notice that starting at `4` and `15` actually yield the same segment, so these need to be filtered out.
 
-![corner-out](animations/corner-out.webm "Corner should be excluded from shape")
-
-![corner-in](animations/corner-in.webm "Corner should be included in shape")
-
-TODO create the individual shapes.
+![shaping](animations/shaping.webm "Creating one segment")
 
 ### Chop up the pieces
 

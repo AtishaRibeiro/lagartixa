@@ -110,6 +110,9 @@ def process_figures(soup: BeautifulSoup, dir: str) -> None:
         div.parent.name = "div"
         div.parent["class"] = f"{class_prefix}root"
 
+        if img_title is None:
+            continue
+
         if img_title:
             title = f"<b>Figure {img_counter}:</b> {img_title}"
         else:
