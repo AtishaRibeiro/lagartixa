@@ -11,12 +11,12 @@ The requirements were pretty straightforward:
 1. Be able to give countries different colours
 1. No satellite imagery
 
-Due to the USSR being so big, it is near impossible to have no visual distortion on a 2D map; think of the Mercator projection that has huge
+Though I first wanted to use a 2D map, due to the USSR being so big, it is near impossible to have no visual distortion; think of the Mercator projection that has huge
 distortions towards the poles. The alternative is thus to just stay in the world of 3D.
 
 The simplest way one might achieve this is by drawing the country borders to some texture, and wrapping that texture around a 3D mesh.
-In that case we will be dealing with distortions again due to the translation from 2D <-> 3D.
-Additionally, since a texture has a finite resolution, zooming into far means you start seeing the pixels which violates our _"looks nice when zoomed in"_ rule.
+In that case we will be dealing with distortions again due to the translation from 2D to 3D.
+Additionally, since a texture has a finite resolution, zooming in too far means you start seeing the pixels which violates our _"looks nice when zoomed in"_ rule.
 
 Although I can't think of any concrete examples, I *have* seen nice globe animations that undoubtedly use some kind of software made specifically for this purpose. But I don't know what they are, and I have no idea how they work on a technical level.
 What to do in that case except come up with your own crazy convoluted solution?
@@ -39,7 +39,8 @@ import geopandas as gpd
 
 data = gpd.read_file("ne_50m_admin_0_countries.shp")
 geo_data = data.loc[data["SOVEREIGNT"] == "Luxembourg"]["geometry"]
-# List of list since  countries can consist of multiple borders: main land, islands, enclaves, ...
+# List of list since  countries can consist of multiple borders:
+# main land, islands, enclaves, ...
 luxembourg: list[list[tuple]] = []
 if isinstance(geo_data, shapely.MultiPolygon):
     for geom in geo_data.geoms:
@@ -271,4 +272,4 @@ We can choose other shapes than the icosahedron. [[different-bases]] shows a few
 Phew, what a journey.
 
 I brushed over a lot of details, and even decided to leave out whole parts as there's just too much to talk about. I hope it does give a bit of an overview and can serve as a guideline to anyone who is trying to achieve something similar. 
-If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe).
+If you're interested, all code is available on [the github page](https://github.com/AtishaRibeiro/globe-mesh).

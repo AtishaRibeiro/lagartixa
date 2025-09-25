@@ -141,7 +141,19 @@ def process_figures(soup: BeautifulSoup, dir: str) -> None:
             text_node.replace_with(new_text)
 
 
-def generate_post_html(name: str) -> None:
+def add_footer(
+    soup: BeautifulSoup, date_published: str, date_edited: str | None
+) -> None:
+    def get_date_p(text: str, date: str) -> BeautifulSoup:
+        soup = f'<p class="footer">{text}: {date}</p>'
+        return BeautifulSoup(soup)
+
+    soup.append(get_date_p("Published", date_published))
+    if date_edited is not None:
+        soup.append(get_date_p("Edited", date_edited))
+
+
+def generate_post_html(name: str, date_published: str, date_edited: str | None) -> None:
     post_dir = os.path.join("posts", name)
     markdown = os.path.join(post_dir, "text.md")
     with open(markdown, "r") as f:
@@ -152,6 +164,7 @@ def generate_post_html(name: str) -> None:
     anchor_headers(html)
     syntax_highlighting(html)
     process_figures(html, post_dir)
+    add_footer(html, date_published, date_edited)
 
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
@@ -195,7 +208,7 @@ def generate_posts_html() -> None:
     print(posts)
 
     for post in posts:
-        generate_post_html(post["name"])
+        generate_post_html(post["name"], post["date"], post.get("edited"))
 
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
