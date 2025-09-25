@@ -8,14 +8,14 @@ iframe {
 }
 
 .video-date {
-  font-size: 24px;
+  font-size: 1.5rem;
   font-weight: bold;
 }
 
 
 .video-notes {
   background: rgb(200, 250, 255);
-  color: rgb(67, 92, 217);
+  color: rgb(60, 90, 200);
   padding: 10px;
   border-radius: 10px;
 }
