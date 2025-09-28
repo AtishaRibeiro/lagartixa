@@ -208,7 +208,7 @@ def generate_posts_html() -> None:
             posts.append(info)
 
     posts = [x for x in posts if x["published"]]
-    posts.sort(key=lambda post: post["date"])
+    posts.sort(key=lambda post: post["date"], reverse=True)
     print(posts)
 
     for post in posts:
