@@ -22,6 +22,10 @@ def root(func):
     return wrapper
 
 
+def fill_links(text: str):
+    return re.sub(r"\[(.*?)\]\((.*?)\)", r'<a href="\2">\1</a>', text)
+
+
 def get_header(rel_dir: str) -> BeautifulSoup:
     with open("templates/header.html", "r") as f:
         soup = BeautifulSoup(f.read(), "html.parser")
@@ -233,6 +237,7 @@ def generate_video_html(video: dict) -> None:
     videos_dir = "videos"
     rel_dir = get_relative_dir_offset(videos_dir)
 
+    video["description"] = fill_links(video["description"])
     video_rendered = video_template.render(video=video)
     post_rendered = base_template.render(
         contents=video_rendered,
