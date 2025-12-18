@@ -60,7 +60,7 @@ def observe_file():
     event_handler = FileModifiedHandler(
         patterns=[
             "templates/*.html",
-            "src/generator.py",
+            "src/**.py",
             "posts/**/text.md",
             "posts/**/info.yml",
         ],

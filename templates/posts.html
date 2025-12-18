@@ -1,10 +1,11 @@
 <div id="post-container" class="centered-column">
 
   {% for post in posts %}
-  <a href="posts/{{ post.name }}" class="post-link">
+  <a href="{{ post.dir }}" class="post-link">
     <div class="post-card">
       <p class="post-date">{{ post.date }}</p>
       <p class="post-title">{{ post.title }}</p>
+      <p class="post-langs">{{ post.languages|join(" ")|upper}}</p>
     </div>
   </a>
 
