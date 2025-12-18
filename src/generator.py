@@ -26,20 +26,6 @@ def fill_links(text: str):
     return re.sub(r"\[(.*?)\]\((.*?)\)", r'<a href="\2">\1</a>', text)
 
 
-def get_header(rel_dir: str) -> BeautifulSoup:
-    with open("templates/header.html", "r") as f:
-        soup = BeautifulSoup(f.read(), "html.parser")
-
-    for image in soup.find_all("img"):
-        image["src"] = os.path.join(rel_dir, image["src"])
-
-    for link in soup.find_all("a"):
-        if "href" in link.attrs:
-            link["href"] = os.path.join(rel_dir, link["href"])
-
-    return soup
-
-
 def get_relative_dir_offset(dir: str) -> str:
     if dir == ".":
         return "."
@@ -150,7 +136,7 @@ def add_footer(
 ) -> None:
     def get_date_p(text: str, date: str) -> BeautifulSoup:
         soup = f'<p class="footer">{text}: {date}</p>'
-        return BeautifulSoup(soup)
+        return BeautifulSoup(soup, "html.parser")
 
     soup.append(get_date_p("Published", date_published))
     if date_edited is not None:
