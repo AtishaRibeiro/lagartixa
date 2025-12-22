@@ -61,7 +61,7 @@ def observe_file():
         patterns=[
             "templates/*.html",
             "src/**.py",
-            "posts/**/text.md",
+            "posts/**/*.md",
             "posts/**/info.yml",
         ],
         ignore_directories=True,

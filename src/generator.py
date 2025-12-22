@@ -1,6 +1,9 @@
 from bs4 import BeautifulSoup
 from jinja2 import Environment, FileSystemLoader
 from marko import Parser, Renderer, convert
+from pygments import highlight
+from pygments.lexers import PythonLexer
+from pygments.formatters import HtmlFormatter
 import os
 import pathlib
 import re
@@ -99,6 +102,45 @@ def generate_simple_html(template: str, destination: str) -> None:
 
     with open(f"{destination}.html", "w") as f:
         f.write(page_rendered)
+        base_template = env.get_template("base.html")
+
+
+def generate_snippets() -> None:
+    """Generate code snippet pages"""
+    env = Environment(loader=FileSystemLoader("templates"))
+    base_template = env.get_template("base.html")
+    snippet_template = env.get_template("snippet.html")
+
+    with os.scandir("snippets") as it:
+        for entry in it:
+            if not entry.is_dir():
+                continue
+
+        snippet_dir = pathlib.Path(entry.path)
+        with open(snippet_dir / "info.yml", "r") as f:
+            snippet_info = yaml.safe_load(f)
+
+        with open(snippet_dir / snippet_info["file"], "r") as f:
+            snippet_content = f.read()
+
+        highlighted = highlight(snippet_content, PythonLexer(), HtmlFormatter())
+
+        snippet_rendered = snippet_template.render(
+            title=snippet_info["title"],
+            description=snippet_info.get("description"),
+            snippet=highlighted,
+        )
+
+        rel_dir = util.get_relative_dir_offset(str(snippet_dir))
+        page_rendered = base_template.render(
+            contents=snippet_rendered,
+            styles=["static/main.css"],
+            _class="centered-column",
+            root_path=rel_dir,
+        )
+
+        with open(snippet_dir / "index.html", "w") as f:
+            f.write(page_rendered)
 
 
 @root
@@ -107,6 +149,7 @@ def generate():
     generate_simple_html("about", "about")
     generate_videos_html()
     generate_posts_html([""])
+    generate_snippets()
 
 
 if __name__ == "__main__":
