@@ -116,31 +116,35 @@ def generate_snippets() -> None:
             if not entry.is_dir():
                 continue
 
-        snippet_dir = pathlib.Path(entry.path)
-        with open(snippet_dir / "info.yml", "r") as f:
-            snippet_info = yaml.safe_load(f)
+            snippet_dir = pathlib.Path(entry.path)
 
-        with open(snippet_dir / snippet_info["file"], "r") as f:
-            snippet_content = f.read()
+            with open(snippet_dir / "info.yml", "r") as f:
+                snippet_info = yaml.safe_load(f)
 
-        highlighted = highlight(snippet_content, PythonLexer(), HtmlFormatter())
+            files = []
+            for file_name in snippet_info["files"]:
+                with open(snippet_dir / file_name, "r") as f:
+                    snippet_content = f.read()
 
-        snippet_rendered = snippet_template.render(
-            title=snippet_info["title"],
-            description=snippet_info.get("description"),
-            snippet=highlighted,
-        )
+                highlighted = highlight(snippet_content, PythonLexer(), HtmlFormatter())
+                files.append({"name": file_name, "content": highlighted})
 
-        rel_dir = util.get_relative_dir_offset(str(snippet_dir))
-        page_rendered = base_template.render(
-            contents=snippet_rendered,
-            styles=["static/main.css"],
-            _class="centered-column",
-            root_path=rel_dir,
-        )
+            snippet_rendered = snippet_template.render(
+                title=snippet_info["title"],
+                # description=snippet_info.get("description"),
+                files=files,
+            )
 
-        with open(snippet_dir / "index.html", "w") as f:
-            f.write(page_rendered)
+            rel_dir = util.get_relative_dir_offset(str(snippet_dir))
+            page_rendered = base_template.render(
+                contents=snippet_rendered,
+                styles=["static/main.css"],
+                _class="centered-column",
+                root_path=rel_dir,
+            )
+
+            with open(snippet_dir / "index.html", "w") as f:
+                f.write(page_rendered)
 
 
 @root

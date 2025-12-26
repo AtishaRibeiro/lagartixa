@@ -2,4 +2,9 @@
 {% if description %}
 <div>{{ description }}</div>
 {% endif %}
-<code>{{ snippet }}</code>
+{% for file in files %}
+  <details>
+    <summary>{{ file.name }}</summary>
+    <div>{{ file.content }}</div>
+  </details>
+{% endfor %}

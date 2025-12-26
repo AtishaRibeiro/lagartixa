@@ -1,0 +1,5 @@
+title: Street names scripts
+description: Some description
+files:
+  - collect_data.py
+  - process_data.py

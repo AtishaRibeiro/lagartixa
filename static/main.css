@@ -123,6 +123,39 @@ code>div>pre {
   border-color: #d0d0d0;
 }
 
+details {
+  font-size: 0.9rem;
+  overflow-x: scroll;
+  color: #8f3f71;
+  background: #f0f0f0;
+  padding-top: 10px;
+  padding-bottom: 10px;
+  padding-left: 20px;
+  border-radius: 7px;
+  border-style: solid;
+  border-color: #d0d0d0;
+  margin-bottom: 10px;
+}
+
+details>summary {
+  font-family: monospace;
+}
+
+details>div {
+  /* border-top: 1px solid grey; */  
+  position: relative;
+  padding-top: 10px;
+}
+
+details>div::before {
+  content: "";
+  position: absolute;
+  top: 10px;    /* Pulls up into the padding */
+  left: -20px;   /* Pulls left into the padding */
+  right: 0px;
+  border-top: 2px solid lightgrey;
+}
+
 /* Function definitions */
 .nf {
   color: #79740e;

@@ -1,0 +1,345 @@
+<!DOCTYPE html>
+<html lang="">
+
+<head>
+  
+  <link rel="stylesheet" href="../../static/main.css">
+  
+</head>
+
+<body>
+  <div id="header" class="centered-column">
+  <div>
+    <a class="right" href="/">Home</a>
+    <a class="right" href="/posts">Posts</a>
+  </div>
+  <img id="site-logo" class="center-img" src="/static/base-logo-smile.png" alt="beautiful site logo"
+    width="200" />
+  <div>
+    <a class="left" href="/videos">Videos</a>
+    <a class="left" href="/about">About</a>
+  </div>
+</div>
+  <div class="centered-column">
+    <h2 style="text-align:center">Street names scripts</h2>
+
+
+  <details>
+    <summary>collect_data.py</summary>
+    <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">overpy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">geom</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">shapely.ops</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">ops</span>
+<span class="kn">from</span><span class="w"> </span><span class="nn">shapely.plotting</span><span class="w"> </span><span class="kn">import</span> <span class="n">plot_polygon</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">time</span>
+
+<span class="n">api</span> <span class="o">=</span> <span class="n">overpy</span><span class="o">.</span><span class="n">Overpass</span><span class="p">()</span>
+
+<span class="n">PROVINCE_NAMES</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Vlaams-Brabant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Antwerpen&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Oost-Vlaanderen&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Limburg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Brabant wallon&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Hainaut&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;West-Vlaanderen&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Namur&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Liège&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;Luxembourg&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">plot_province_shapely</span><span class="p">(</span><span class="n">provinces</span><span class="p">):</span>
+<span class="w">    </span><span class="sd">&quot;&quot;&quot;Using shapely&#39;s plotting function&quot;&quot;&quot;</span>
+    <span class="k">for</span> <span class="n">name</span><span class="p">,</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">provinces</span><span class="p">:</span>
+        <span class="n">fig</span><span class="p">,</span> <span class="n">ax</span> <span class="o">=</span> <span class="n">plt</span><span class="o">.</span><span class="n">subplots</span><span class="p">(</span><span class="mi">1</span><span class="p">,</span> <span class="mi">1</span><span class="p">,</span> <span class="n">figsize</span><span class="o">=</span><span class="p">(</span><span class="mi">10</span><span class="p">,</span> <span class="mi">8</span><span class="p">))</span>
+
+        <span class="n">plot_polygon</span><span class="p">(</span><span class="n">poly</span><span class="p">,</span> <span class="n">ax</span><span class="o">=</span><span class="n">ax</span><span class="p">,</span> <span class="n">add_points</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">color</span><span class="o">=</span><span class="s2">&quot;lightblue&quot;</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.7</span><span class="p">)</span>
+
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_title</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;</span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2"> Province Boundary (Shapely Plot)&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_xlabel</span><span class="p">(</span><span class="s2">&quot;Longitude&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_ylabel</span><span class="p">(</span><span class="s2">&quot;Latitude&quot;</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">grid</span><span class="p">(</span><span class="kc">True</span><span class="p">,</span> <span class="n">alpha</span><span class="o">=</span><span class="mf">0.3</span><span class="p">)</span>
+        <span class="n">ax</span><span class="o">.</span><span class="n">set_aspect</span><span class="p">(</span><span class="s2">&quot;equal&quot;</span><span class="p">)</span>
+
+        <span class="n">plt</span><span class="o">.</span><span class="n">tight_layout</span><span class="p">()</span>
+        <span class="n">plt</span><span class="o">.</span><span class="n">show</span><span class="p">()</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_streets</span><span class="p">(</span><span class="n">area</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        [out:json][timeout:500];</span>
+<span class="s2">        </span><span class="si">{</span><span class="n">area</span><span class="si">}</span>
+<span class="s2">        way[&quot;highway&quot;][&quot;name&quot;](area.searchArea);</span>
+<span class="s2">        out center tags;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">get_province_area</span><span class="p">(</span><span class="n">admin_level</span><span class="p">:</span> <span class="nb">int</span><span class="p">,</span> <span class="n">province</span><span class="p">:</span> <span class="nb">str</span><span class="p">):</span>
+    <span class="n">result</span> <span class="o">=</span> <span class="n">api</span><span class="o">.</span><span class="n">query</span><span class="p">(</span>
+        <span class="sa">f</span><span class="s2">&quot;&quot;&quot;</span>
+<span class="s2">        [out:json][timeout:500];</span>
+<span class="s2">        (</span>
+<span class="s2">          relation[&quot;boundary&quot;=&quot;administrative&quot;][&quot;admin_level&quot;=&quot;</span><span class="si">{</span><span class="n">admin_level</span><span class="si">}</span><span class="s2">&quot;][&quot;name&quot;=&quot;</span><span class="si">{</span><span class="n">province</span><span class="si">}</span><span class="s2">&quot;];</span>
+<span class="s2">          way(r);</span>
+<span class="s2">          node(w);</span>
+<span class="s2">        );</span>
+<span class="s2">        out geom;</span>
+<span class="s2">    &quot;&quot;&quot;</span>
+    <span class="p">)</span>
+    <span class="k">return</span> <span class="n">result</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">build_polygons_from_ways</span><span class="p">(</span><span class="n">province_names</span><span class="p">,</span> <span class="n">provinces_res</span><span class="p">):</span>
+    <span class="n">provinces</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">name</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">province_names</span><span class="p">):</span>
+        <span class="n">result</span> <span class="o">=</span> <span class="n">provinces_res</span><span class="p">[</span><span class="n">i</span><span class="p">]</span>
+
+        <span class="c1"># Get the relation</span>
+        <span class="k">if</span> <span class="ow">not</span> <span class="n">result</span><span class="o">.</span><span class="n">relations</span><span class="p">:</span>
+            <span class="k">continue</span>
+
+        <span class="n">rel</span> <span class="o">=</span> <span class="n">result</span><span class="o">.</span><span class="n">relations</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span>
+
+        <span class="c1"># Group ways by role</span>
+        <span class="n">outer_ways</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">member</span> <span class="ow">in</span> <span class="n">rel</span><span class="o">.</span><span class="n">members</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">member</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;outer&quot;</span> <span class="ow">or</span> <span class="n">member</span><span class="o">.</span><span class="n">role</span> <span class="o">==</span> <span class="s2">&quot;&quot;</span><span class="p">:</span>
+                <span class="c1"># Find the way with this ID</span>
+                <span class="n">way</span> <span class="o">=</span> <span class="nb">next</span><span class="p">((</span><span class="n">w</span> <span class="k">for</span> <span class="n">w</span> <span class="ow">in</span> <span class="n">result</span><span class="o">.</span><span class="n">ways</span> <span class="k">if</span> <span class="n">w</span><span class="o">.</span><span class="n">id</span> <span class="o">==</span> <span class="n">member</span><span class="o">.</span><span class="n">ref</span><span class="p">),</span> <span class="kc">None</span><span class="p">)</span>
+                <span class="k">if</span> <span class="n">way</span><span class="p">:</span>
+                    <span class="n">outer_ways</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">way</span><span class="p">)</span>
+
+        <span class="c1"># Build coordinate list from ways (preserves order)</span>
+        <span class="n">all_coords</span> <span class="o">=</span> <span class="p">[]</span>
+        <span class="k">for</span> <span class="n">way</span> <span class="ow">in</span> <span class="n">outer_ways</span><span class="p">:</span>
+            <span class="n">way_coords</span> <span class="o">=</span> <span class="p">[(</span><span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">lon</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">node</span><span class="o">.</span><span class="n">lat</span><span class="p">))</span> <span class="k">for</span> <span class="n">node</span> <span class="ow">in</span> <span class="n">way</span><span class="o">.</span><span class="n">nodes</span><span class="p">]</span>
+            <span class="n">all_coords</span><span class="o">.</span><span class="n">extend</span><span class="p">(</span><span class="n">way_coords</span><span class="p">)</span>
+
+        <span class="k">if</span> <span class="nb">len</span><span class="p">(</span><span class="n">all_coords</span><span class="p">)</span> <span class="o">&gt;=</span> <span class="mi">3</span><span class="p">:</span>
+            <span class="k">try</span><span class="p">:</span>
+                <span class="c1"># Remove consecutive duplicates</span>
+                <span class="n">coords</span> <span class="o">=</span> <span class="p">[</span><span class="n">all_coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]]</span>
+                <span class="k">for</span> <span class="n">coord</span> <span class="ow">in</span> <span class="n">all_coords</span><span class="p">[</span><span class="mi">1</span><span class="p">:]:</span>
+                    <span class="k">if</span> <span class="n">coord</span> <span class="o">!=</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                        <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coord</span><span class="p">)</span>
+
+                <span class="c1"># Close polygon</span>
+                <span class="k">if</span> <span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">]</span> <span class="o">!=</span> <span class="n">coords</span><span class="p">[</span><span class="o">-</span><span class="mi">1</span><span class="p">]:</span>
+                    <span class="n">coords</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">coords</span><span class="p">[</span><span class="mi">0</span><span class="p">])</span>
+
+                <span class="n">poly</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">Polygon</span><span class="p">(</span><span class="n">coords</span><span class="p">)</span>
+
+                <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+                    <span class="n">provinces</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span>
+                    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Created polygon for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+                <span class="k">else</span><span class="p">:</span>
+                    <span class="n">poly</span> <span class="o">=</span> <span class="n">poly</span><span class="o">.</span><span class="n">buffer</span><span class="p">(</span><span class="mi">0</span><span class="p">)</span>
+                    <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">is_valid</span><span class="p">:</span>
+                        <span class="n">provinces</span><span class="o">.</span><span class="n">append</span><span class="p">((</span><span class="n">name</span><span class="p">,</span> <span class="n">poly</span><span class="p">))</span>
+                        <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✓ Fixed polygon for </span><span class="si">{</span><span class="n">name</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+            <span class="k">except</span> <span class="ne">Exception</span> <span class="k">as</span> <span class="n">e</span><span class="p">:</span>
+                <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;✗ Error: </span><span class="si">{</span><span class="n">e</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+    <span class="k">return</span> <span class="n">provinces</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="n">area</span> <span class="o">=</span> <span class="s1">&#39;area[&quot;ISO3166-1&quot;=&quot;BE&quot;][admin_level=2]-&gt;.searchArea;&#39;</span>
+    <span class="c1"># area = &#39;area[&quot;name&quot;=&quot;Leuven&quot;][&quot;boundary&quot;=&quot;administrative&quot;][&quot;admin_level&quot;=&quot;8&quot;]-&gt;.searchArea;&#39;</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetching provinces&quot;</span><span class="p">)</span>
+    <span class="n">provinces_res</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">i</span><span class="p">,</span> <span class="n">n</span> <span class="ow">in</span> <span class="nb">enumerate</span><span class="p">(</span><span class="n">PROVINCE_NAMES</span><span class="p">):</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">n</span><span class="p">)</span>
+        <span class="k">if</span> <span class="n">i</span> <span class="o">==</span> <span class="mi">0</span><span class="p">:</span>  <span class="c1"># Brussels</span>
+            <span class="n">provinces_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_province_area</span><span class="p">(</span><span class="mi">4</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+        <span class="k">else</span><span class="p">:</span>  <span class="c1"># Other provinces</span>
+            <span class="n">provinces_res</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">get_province_area</span><span class="p">(</span><span class="mi">6</span><span class="p">,</span> <span class="n">n</span><span class="p">))</span>
+
+        <span class="c1"># Sleep to prevent timeout</span>
+        <span class="n">time</span><span class="o">.</span><span class="n">sleep</span><span class="p">(</span><span class="mi">5</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="n">provinces_res</span><span class="p">)</span>
+
+    <span class="n">provinces</span> <span class="o">=</span> <span class="n">build_polygons_from_ways</span><span class="p">(</span><span class="n">PROVINCE_NAMES</span><span class="p">,</span> <span class="n">provinces_res</span><span class="p">)</span>
+    <span class="n">plot_province_shapely</span><span class="p">(</span><span class="n">provinces</span><span class="p">)</span>
+    <span class="nb">print</span><span class="p">(</span><span class="n">provinces</span><span class="p">)</span>
+
+    <span class="nb">print</span><span class="p">(</span><span class="s2">&quot;Fetching streets&quot;</span><span class="p">)</span>
+    <span class="n">streets_res</span> <span class="o">=</span> <span class="n">get_streets</span><span class="p">(</span><span class="n">area</span><span class="p">)</span>
+    <span class="c1"># Match each street to a province</span>
+    <span class="n">output</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">way</span> <span class="ow">in</span> <span class="n">streets_res</span><span class="o">.</span><span class="n">ways</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">way</span><span class="o">.</span><span class="n">center_lat</span> <span class="ow">is</span> <span class="kc">None</span><span class="p">:</span>
+            <span class="k">continue</span>
+        <span class="n">point</span> <span class="o">=</span> <span class="n">geom</span><span class="o">.</span><span class="n">Point</span><span class="p">(</span><span class="nb">float</span><span class="p">(</span><span class="n">way</span><span class="o">.</span><span class="n">center_lon</span><span class="p">),</span> <span class="nb">float</span><span class="p">(</span><span class="n">way</span><span class="o">.</span><span class="n">center_lat</span><span class="p">))</span>
+        <span class="n">province_name</span> <span class="o">=</span> <span class="kc">None</span>
+        <span class="k">for</span> <span class="n">pname</span><span class="p">,</span> <span class="n">poly</span> <span class="ow">in</span> <span class="n">provinces</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">poly</span><span class="o">.</span><span class="n">contains</span><span class="p">(</span><span class="n">point</span><span class="p">):</span>
+                <span class="n">province_name</span> <span class="o">=</span> <span class="n">pname</span>
+                <span class="k">break</span>
+        <span class="n">output</span><span class="o">.</span><span class="n">append</span><span class="p">(</span>
+            <span class="p">{</span>
+                <span class="s2">&quot;id&quot;</span><span class="p">:</span> <span class="n">way</span><span class="o">.</span><span class="n">id</span><span class="p">,</span>
+                <span class="s2">&quot;name&quot;</span><span class="p">:</span> <span class="n">way</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;name&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;highway&quot;</span><span class="p">:</span> <span class="n">way</span><span class="o">.</span><span class="n">tags</span><span class="o">.</span><span class="n">get</span><span class="p">(</span><span class="s2">&quot;highway&quot;</span><span class="p">),</span>
+                <span class="s2">&quot;center_lat&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">way</span><span class="o">.</span><span class="n">center_lat</span><span class="p">),</span>
+                <span class="s2">&quot;center_lon&quot;</span><span class="p">:</span> <span class="nb">float</span><span class="p">(</span><span class="n">way</span><span class="o">.</span><span class="n">center_lon</span><span class="p">),</span>
+                <span class="s2">&quot;province&quot;</span><span class="p">:</span> <span class="n">province_name</span><span class="p">,</span>
+            <span class="p">}</span>
+        <span class="p">)</span>
+
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;res.json&quot;</span><span class="p">,</span> <span class="s2">&quot;w&quot;</span><span class="p">,</span> <span class="n">encoding</span><span class="o">=</span><span class="s2">&quot;utf=8&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">json</span><span class="o">.</span><span class="n">dump</span><span class="p">(</span><span class="n">output</span><span class="p">,</span> <span class="n">f</span><span class="p">,</span> <span class="n">ensure_ascii</span><span class="o">=</span><span class="kc">False</span><span class="p">,</span> <span class="n">indent</span><span class="o">=</span><span class="mi">2</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+  </details>
+
+  <details>
+    <summary>process_data.py</summary>
+    <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+
+<span class="n">PROVINCE_INCLUDE_FILTER</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="c1"># &quot;Région de Bruxelles-Capitale - Brussels Hoofdstedelijk Gewest&quot;,</span>
+    <span class="c1"># &quot;Vlaams-Brabant&quot;,</span>
+    <span class="c1"># &quot;Antwerpen&quot;,</span>
+    <span class="c1"># &quot;Oost-Vlaanderen&quot;,</span>
+    <span class="c1"># &quot;Limburg&quot;,</span>
+    <span class="c1"># &quot;Brabant wallon&quot;,</span>
+    <span class="c1"># &quot;Hainaut&quot;,</span>
+    <span class="c1"># &quot;West-Vlaanderen&quot;,</span>
+    <span class="c1"># &quot;Namur&quot;,</span>
+    <span class="c1"># &quot;Liège&quot;,</span>
+    <span class="c1"># &quot;Luxembourg&quot;,</span>
+    <span class="c1"># None</span>
+<span class="p">]</span>
+
+<span class="n">EXCLUDE_FILTER</span> <span class="o">=</span> <span class="p">[</span>
+    <span class="s2">&quot;n°&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nᵒ&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;/&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;(&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nr.&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;&gt;&quot;</span><span class="p">,</span>
+    <span class="s2">&quot; — &quot;</span><span class="p">,</span>
+    <span class="s2">&quot; - &quot;</span><span class="p">,</span>
+    <span class="s2">&quot;- &quot;</span><span class="p">,</span>
+    <span class="s2">&quot; -&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;;&quot;</span><span class="p">,</span>
+    <span class="s1">&#39;&quot;&#39;</span><span class="p">,</span>
+    <span class="s2">&quot;chemin priv&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parking&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;train vicinal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chemin vicinal&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;driveway&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;vzw&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;toegangsweg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;bedrijvenzone&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;industrieterrein&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;industriepark&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zoning industriel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zone industrielle&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parc industriel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;koppelingsgebieden&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;dit stuk verharding&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;toegangsweg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;werfweg&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;road&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;ravel &quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parcours&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chemin de fer&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;sncb&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;nmbs&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;voetgangerstunnel&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;spoorwegbedding&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;parc d&#39;activités&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;éco-pédagogique&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;pieds nus&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;numéro&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chemin traversant&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;zone piétonne&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chemein d&#39;accès&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;chemin d&#39;accès&quot;</span><span class="p">,</span>
+    <span class="c1"># Specific &quot;streets&quot;</span>
+    <span class="s2">&quot;avenue marie-thérèse et andré dujardin-simoenslaan&quot;</span><span class="p">,</span>
+    <span class="s2">&quot;1000 bornes à vélo région hainaut-est&quot;</span><span class="p">,</span>
+<span class="p">]</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">filter</span><span class="p">(</span>
+    <span class="n">node</span><span class="p">,</span>
+    <span class="n">exclude</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">include</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+    <span class="n">province_include</span><span class="p">:</span> <span class="nb">list</span> <span class="o">|</span> <span class="kc">None</span> <span class="o">=</span> <span class="kc">None</span><span class="p">,</span>
+<span class="p">)</span> <span class="o">-&gt;</span> <span class="nb">bool</span><span class="p">:</span>
+    <span class="k">if</span> <span class="n">province_include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">if</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;province&quot;</span><span class="p">]</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">province_include</span><span class="p">:</span>
+            <span class="k">return</span> <span class="kc">False</span>
+
+    <span class="n">name</span> <span class="o">=</span> <span class="n">node</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+    <span class="k">if</span> <span class="n">exclude</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">exclude</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">if</span> <span class="n">include</span> <span class="ow">is</span> <span class="ow">not</span> <span class="kc">None</span><span class="p">:</span>
+        <span class="k">for</span> <span class="n">f</span> <span class="ow">in</span> <span class="n">include</span><span class="p">:</span>
+            <span class="k">if</span> <span class="n">f</span> <span class="ow">not</span> <span class="ow">in</span> <span class="n">name</span><span class="o">.</span><span class="n">lower</span><span class="p">():</span>
+                <span class="k">return</span> <span class="kc">False</span>
+    <span class="k">return</span> <span class="kc">True</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">print_list</span><span class="p">(</span><span class="n">l</span><span class="p">:</span> <span class="nb">list</span><span class="p">):</span>
+    <span class="k">for</span> <span class="n">i</span> <span class="ow">in</span> <span class="n">l</span><span class="p">:</span>
+        <span class="nb">print</span><span class="p">(</span><span class="n">i</span><span class="p">)</span>
+
+
+<span class="k">def</span><span class="w"> </span><span class="nf">main</span><span class="p">():</span>
+    <span class="k">with</span> <span class="nb">open</span><span class="p">(</span><span class="s2">&quot;res.json&quot;</span><span class="p">,</span> <span class="s2">&quot;r&quot;</span><span class="p">)</span> <span class="k">as</span> <span class="n">f</span><span class="p">:</span>
+        <span class="n">data</span> <span class="o">=</span> <span class="n">json</span><span class="o">.</span><span class="n">load</span><span class="p">(</span><span class="n">f</span><span class="p">)</span>
+
+    <span class="n">new_data</span> <span class="o">=</span> <span class="p">[]</span>
+    <span class="k">for</span> <span class="n">d</span> <span class="ow">in</span> <span class="n">data</span><span class="p">:</span>
+        <span class="n">n</span> <span class="o">=</span> <span class="n">d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span>
+        <span class="n">split1</span> <span class="o">=</span> <span class="n">n</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; / &quot;</span><span class="p">)</span>
+        <span class="k">for</span> <span class="n">s</span> <span class="ow">in</span> <span class="n">split1</span><span class="p">:</span>
+            <span class="n">split2</span> <span class="o">=</span> <span class="n">s</span><span class="o">.</span><span class="n">split</span><span class="p">(</span><span class="s2">&quot; - &quot;</span><span class="p">)</span>
+            <span class="k">for</span> <span class="n">s2</span> <span class="ow">in</span> <span class="n">split2</span><span class="p">:</span>
+                <span class="n">new_d</span> <span class="o">=</span> <span class="n">copy</span><span class="o">.</span><span class="n">deepcopy</span><span class="p">(</span><span class="n">d</span><span class="p">)</span>
+                <span class="n">new_d</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="o">=</span> <span class="n">s2</span>
+                <span class="n">new_data</span><span class="o">.</span><span class="n">append</span><span class="p">(</span><span class="n">new_d</span><span class="p">)</span>
+
+    <span class="n">data</span> <span class="o">=</span> <span class="n">new_data</span>
+    <span class="c1"># Filter out specific words/characters</span>
+    <span class="n">data</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span> <span class="k">if</span> <span class="nb">filter</span><span class="p">(</span><span class="n">x</span><span class="p">,</span> <span class="n">exclude</span><span class="o">=</span><span class="n">EXCLUDE_FILTER</span><span class="p">)]</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="nb">list</span><span class="p">(</span><span class="nb">set</span><span class="p">([</span><span class="n">x</span><span class="p">[</span><span class="s2">&quot;name&quot;</span><span class="p">]</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">data</span><span class="p">]))</span>
+    <span class="c1"># Remove spaces from beginning and end</span>
+    <span class="n">names</span> <span class="o">=</span> <span class="p">[</span><span class="n">x</span><span class="o">.</span><span class="n">strip</span><span class="p">(</span><span class="s2">&quot; &quot;</span><span class="p">)</span> <span class="k">for</span> <span class="n">x</span> <span class="ow">in</span> <span class="n">names</span><span class="p">]</span>
+
+    <span class="n">names</span><span class="o">.</span><span class="n">sort</span><span class="p">(</span><span class="n">key</span><span class="o">=</span><span class="k">lambda</span> <span class="n">x</span><span class="p">:</span> <span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">))</span>
+    <span class="c1"># names.sort(key=lambda x: len(x) - x.count(&quot; &quot;))</span>
+    <span class="n">print_list</span><span class="p">(</span><span class="n">names</span><span class="p">[</span><span class="o">-</span><span class="mi">1000</span><span class="p">:])</span>
+    <span class="nb">print</span><span class="p">(</span><span class="sa">f</span><span class="s2">&quot;Average length: </span><span class="si">{</span><span class="nb">sum</span><span class="p">((</span><span class="nb">len</span><span class="p">(</span><span class="n">x</span><span class="p">)</span><span class="w"> </span><span class="k">for</span><span class="w"> </span><span class="n">x</span><span class="w"> </span><span class="ow">in</span><span class="w"> </span><span class="n">names</span><span class="p">))</span><span class="w"> </span><span class="o">/</span><span class="w"> </span><span class="nb">len</span><span class="p">(</span><span class="n">names</span><span class="p">)</span><span class="si">}</span><span class="s2">&quot;</span><span class="p">)</span>
+
+
+<span class="k">if</span> <span class="vm">__name__</span> <span class="o">==</span> <span class="s2">&quot;__main__&quot;</span><span class="p">:</span>
+    <span class="n">main</span><span class="p">()</span>
+</pre></div>
+</div>
+  </details>
+
+  </div>
+</body>
+
+</html>
