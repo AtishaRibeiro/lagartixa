@@ -4,7 +4,7 @@ Bij mij in de buurt is er een straat met de behoorlijk lange naam "Tweekleineweg
 Buiten het feit dat iemand precies niet kon beslissen of het nu 1 straat is of 2 (kleine) wegen, heb ik mij al vaker afgevraagd of dit niet een van de langere straatnamen in België zou zijn. 
 Gelukkig is die vraag beantwoorden tegenwoordig redelijk makkelijk, en een dagje prutsen met Python en OpenStreetMaps geeft ons het antwoord (en meer)!
 
-De code die ik heb gebruikt kunt ge [hier](TODO) vinden.
+De code die ik heb gebruikt kunt ge [hier](/snippets/street-names) vinden.
 
 Om het iets interessanter te maken heb ik een paar manieren gevonden om de langste naam te bekomen, maar de winnaar steekt er echt wel uit.
 

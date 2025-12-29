@@ -127,10 +127,8 @@ details {
   font-size: 0.9rem;
   overflow-x: scroll;
   color: #8f3f71;
-  background: #f0f0f0;
+  background: #f8f8f8;
   padding-top: 10px;
-  padding-bottom: 10px;
-  padding-left: 20px;
   border-radius: 7px;
   border-style: solid;
   border-color: #d0d0d0;
@@ -139,19 +137,25 @@ details {
 
 details>summary {
   font-family: monospace;
+  cursor: pointer;
+  padding-bottom: 10px;
+  padding-left: 20px;
 }
 
 details>div {
-  /* border-top: 1px solid grey; */  
   position: relative;
-  padding-top: 10px;
+  background: #f0f0f0;
+  padding-top: 1px;
+  padding-left: 20px;
+  padding-bottom: 10px;
 }
 
 details>div::before {
   content: "";
   position: absolute;
-  top: 10px;    /* Pulls up into the padding */
-  left: -20px;   /* Pulls left into the padding */
+  /* Pulls up into the padding */
+  left: -20px;
+  /* Pulls left into the padding */
   right: 0px;
   border-top: 2px solid lightgrey;
 }
