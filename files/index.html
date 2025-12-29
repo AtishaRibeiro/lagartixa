@@ -1,30 +1,42 @@
-<h2 style="text-align:center">{{ title }}</h2>
-{% if description %}
-<div>{{ description }}</div>
-{% endif %}
+<!DOCTYPE html>
+<html lang="">
 
-{% if dirs %}
-<div class="dirs">
-  {% for dir in dirs %}
-  <p><a href="{{ dir }}/">{{ dir }}/</a></p>
-  {% endfor %}
+<head>
+  
+  <link rel="stylesheet" href="../static/main.css">
+  
+</head>
+
+<body>
+  <div id="header" class="centered-column">
+  <div>
+    <a class="right" href="/">Home</a>
+    <a class="right" href="/posts">Posts</a>
+  </div>
+  <img id="site-logo" class="center-img" src="/static/base-logo-smile.png" alt="beautiful site logo"
+    width="200" />
+  <div>
+    <a class="left" href="/videos">Videos</a>
+    <a class="left" href="/about">About</a>
+  </div>
 </div>
-{% endif %}
+  <div class="centered-column">
+    <h2 style="text-align:center">Files</h2>
 
-{% for file in files %}
-<details>
-  <summary><span>{{ file.name }}
-      <span class="copy-status">Copied!</span>
-      <div class="file-icons">
-        <a href="{{ file.url }}"><img class="code" width="20px" src="/static/icons/code.jpg"
-            title="Open raw file" /></a>
-        <img class="copy" width="20px" src="/static/icons/copy_paste.jpg" title="Copy raw file" />
-      </div>
-    </span>
-  </summary>
-  <div>{{ file.content }}</div>
-</details>
-{% endfor %}
+
+
+<div class="dirs">
+  
+  <p><a href="data/">data/</a></p>
+  
+  <p><a href="street-names/">street-names/</a></p>
+  
+  <p><a href="test/">test/</a></p>
+  
+</div>
+
+
+
 
 
 <script>
@@ -53,3 +65,7 @@
     }
   });
 </script>
+  </div>
+</body>
+
+</html>

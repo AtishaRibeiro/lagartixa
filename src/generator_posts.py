@@ -210,8 +210,6 @@ def get_all_post_info() -> list[Post]:
             base_post.overwrite_with_dict(info)
             languages = info.get("languages", [])
 
-            print("====")
-            print(languages)
             for i, language in enumerate(languages):
                 post = copy.deepcopy(base_post)
                 post.language = language

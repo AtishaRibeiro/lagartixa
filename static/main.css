@@ -7,12 +7,12 @@
 
 @font-face {
   font-family: shrikhand;
-  src: url("static/fonts/Shrikhand/Shrikhand-Regular.ttf");
+  src: url("fonts/Shrikhand/Shrikhand-Regular.ttf");
 }
 
 @font-face {
   font-family: merri;
-  src: url("static/fonts/Merriweather/Merriweather-Bold.ttf");
+  src: url("fonts/Merriweather/Merriweather-Bold.ttf");
 }
 
 body {
@@ -101,6 +101,18 @@ img {
   text-align: right;
 }
 
+.dirs {
+  /* color: #8f3f71; */
+  font-size: 0.9rem;
+  font-family: monospace;
+  background: #e0e0ff;
+  border-radius: 7px;
+  border-style: solid;
+  border-color: #d0d0d0;
+  padding-left: 10px;
+  margin-bottom: 10px;
+}
+
 /* Everything code related */
 
 code:not(:has(> *)) {
@@ -138,8 +150,30 @@ details {
 details>summary {
   font-family: monospace;
   cursor: pointer;
+  user-select: none;
   padding-bottom: 10px;
   padding-left: 20px;
+  width: auto;
+}
+
+details>summary>span {
+  padding-left: 5px;
+  display: inline-flex;
+  align-items: center;
+  vertical-align: middle;
+  width: calc(100% - 30px);
+}
+
+details>summary>span>.copy-status {
+  margin-left: auto;
+  margin-right: auto;
+  cursor: pointer;
+  visibility: hidden;
+}
+
+details>summary>span>.file-icons {
+  margin-left: auto;
+  cursor: pointer;
 }
 
 details>div {

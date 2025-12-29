@@ -105,46 +105,75 @@ def generate_simple_html(template: str, destination: str) -> None:
         base_template = env.get_template("base.html")
 
 
-def generate_snippets() -> None:
-    """Generate code snippet pages"""
+def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
+    """Recursively generate file pages"""
+
+    print(f"generating dir '{dir}'")
+
+    if not dir.is_dir():
+        return
+
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
     snippet_template = env.get_template("snippet.html")
 
-    with os.scandir("snippets") as it:
+    dirs = []
+    files = []
+    info = {}
+
+    with os.scandir(dir) as it:
         for entry in it:
-            if not entry.is_dir():
-                continue
+            entry_path = pathlib.Path(entry.path)
+            is_dir = entry.is_dir()
+            if is_dir:
+                generate_file_viewer(entry_path, False)
+                dirs.append(entry_path.name)
+            else:
+                # index.html is what we generate here
+                if entry_path.name == "index.html":
+                    continue
 
-            snippet_dir = pathlib.Path(entry.path)
+                with open(entry_path, "r") as f:
+                    if entry_path.name == "info.yml":
+                        info = yaml.safe_load(f)
+                    else:
+                        snippet_content = f.read()
+                        highlighted = highlight(
+                            snippet_content, PythonLexer(), HtmlFormatter()
+                        )
+                        files.append(
+                            {
+                                "name": entry_path.name,
+                                "content": highlighted,
+                                "url": str(pathlib.Path(*entry_path.parts[1:])),
+                            }
+                        )
 
-            with open(snippet_dir / "info.yml", "r") as f:
-                snippet_info = yaml.safe_load(f)
+    if len(dirs) == 0 and len(files) == 0:
+        title = "Empty Folder"
+    else:
+        title = info.get("title", dir.name.title())
 
-            files = []
-            for file_name in snippet_info["files"]:
-                with open(snippet_dir / file_name, "r") as f:
-                    snippet_content = f.read()
+    # Add a way to get back up
+    if not root:
+        dirs = [".."] + dirs
 
-                highlighted = highlight(snippet_content, PythonLexer(), HtmlFormatter())
-                files.append({"name": file_name, "content": highlighted})
+    snippet_rendered = snippet_template.render(
+        title=title,
+        dirs=dirs,
+        files=files,
+    )
 
-            snippet_rendered = snippet_template.render(
-                title=snippet_info["title"],
-                # description=snippet_info.get("description"),
-                files=files,
-            )
+    rel_dir = util.get_relative_dir_offset(str(dir))
+    page_rendered = base_template.render(
+        contents=snippet_rendered,
+        styles=["static/main.css"],
+        _class="centered-column",
+        root_path=rel_dir,
+    )
 
-            rel_dir = util.get_relative_dir_offset(str(snippet_dir))
-            page_rendered = base_template.render(
-                contents=snippet_rendered,
-                styles=["static/main.css"],
-                _class="centered-column",
-                root_path=rel_dir,
-            )
-
-            with open(snippet_dir / "index.html", "w") as f:
-                f.write(page_rendered)
+    with open(dir / "index.html", "w") as f:
+        f.write(page_rendered)
 
 
 @root
@@ -153,7 +182,7 @@ def generate():
     generate_simple_html("about", "about")
     generate_videos_html()
     generate_posts_html([""])
-    generate_snippets()
+    generate_file_viewer(pathlib.Path("files"), True)
 
 
 if __name__ == "__main__":

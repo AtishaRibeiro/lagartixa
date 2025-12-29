@@ -26,8 +26,7 @@ def static_page(page):
     path = pathlib.Path(page)
 
     print(path)
-    if path.suffix in [".png", ".jpg", ".webm"]:
-        print(path)
+    if path.suffix in [".png", ".jpg", ".webm", ".py", ".txt"]:
         return send_from_directory(os.path.join("..", path.parent), path.name)
 
     if pathlib.Path(f"{page}.html").exists():

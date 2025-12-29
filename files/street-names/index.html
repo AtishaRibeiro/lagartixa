@@ -24,9 +24,26 @@
     <h2 style="text-align:center">Street names scripts</h2>
 
 
-  <details>
-    <summary>collect_data.py</summary>
-    <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
+
+<div class="dirs">
+  
+  <p><a href="../">../</a></p>
+  
+</div>
+
+
+
+<details>
+  <summary><span>collect_data.py
+      <span class="copy-status">Copied!</span>
+      <div class="file-icons">
+        <a href="street-names/collect_data.py"><img class="code" width="20px" src="/static/icons/code.jpg"
+            title="Open raw file" /></a>
+        <img class="copy" width="20px" src="/static/icons/copy_paste.jpg" title="Copy raw file" />
+      </div>
+    </span>
+  </summary>
+  <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">matplotlib.pyplot</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">plt</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">overpy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">shapely.geometry</span><span class="w"> </span><span class="k">as</span><span class="w"> </span><span class="nn">geom</span>
@@ -203,11 +220,19 @@
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-  </details>
+</details>
 
-  <details>
-    <summary>process_data.py</summary>
-    <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
+<details>
+  <summary><span>process_data.py
+      <span class="copy-status">Copied!</span>
+      <div class="file-icons">
+        <a href="street-names/process_data.py"><img class="code" width="20px" src="/static/icons/code.jpg"
+            title="Open raw file" /></a>
+        <img class="copy" width="20px" src="/static/icons/copy_paste.jpg" title="Copy raw file" />
+      </div>
+    </span>
+  </summary>
+  <div><div class="highlight"><pre><span></span><span class="kn">import</span><span class="w"> </span><span class="nn">copy</span>
 <span class="kn">import</span><span class="w"> </span><span class="nn">json</span>
 
 
@@ -337,8 +362,36 @@
     <span class="n">main</span><span class="p">()</span>
 </pre></div>
 </div>
-  </details>
+</details>
 
+
+
+<script>
+  document.addEventListener('click', function (e) {
+    // Check if the clicked element is our copy button
+    if (e.target && e.target.classList.contains('copy')) {
+      console.log(e)
+      e.preventDefault();
+      e.stopPropagation(); // Prevents the <details> from toggling
+
+      // Find the closest <details> then find the .highlight div inside it
+      const container = e.target.closest('details');
+      const codeBlock = container.querySelector('.highlight');
+
+      if (codeBlock) {
+        // .innerText pulls clean text, ignoring all of Pygments' spans/line numbers
+        const text = codeBlock.textContent;
+        console.log(text);
+
+        navigator.clipboard.writeText(text).then(() => {
+          const copyStatus = container.querySelector('.copy-status');
+          copyStatus.style.visibility = "visible";
+          setTimeout(() => copyStatus.style.visibility = "hidden", 1500);
+        });
+      }
+    }
+  });
+</script>
   </div>
 </body>
 
