@@ -127,7 +127,7 @@ def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
             is_dir = entry.is_dir()
             if is_dir:
                 generate_file_viewer(entry_path, False)
-                dirs.append(entry_path.name)
+                dirs.append({"name": entry_path.name + "/", "url": entry_path})
             else:
                 # index.html is what we generate here
                 if entry_path.name == "index.html":
@@ -155,8 +155,8 @@ def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
         title = info.get("title", dir.name.title())
 
     # Add a way to get back up
-    if not root:
-        dirs = [".."] + dirs
+    # if not root:
+    #     dirs = [{"name": "../", "url": "/" + str(dir.parent)}] + dirs
 
     snippet_rendered = snippet_template.render(
         title=title,

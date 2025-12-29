@@ -6,7 +6,7 @@
 {% if dirs %}
 <div class="dirs">
   {% for dir in dirs %}
-  <p><a href="{{ dir }}/">{{ dir }}/</a></p>
+  <p><a href="{{ dir.url }}">{{ dir.name }}</a></p>
   {% endfor %}
 </div>
 {% endif %}
