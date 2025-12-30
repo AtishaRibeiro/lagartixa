@@ -66,6 +66,8 @@ EXCLUDE_FILTER = [
     # Specific "streets"
     "avenue marie-thérèse et andré dujardin-simoenslaan",
     "1000 bornes à vélo région hainaut-est",
+    " ",
+    "-",
 ]
 
 
@@ -78,6 +80,16 @@ def filter(
     if province_include is not None:
         if node["province"] not in province_include:
             return False
+    if node["highway"] in [
+        "path",
+        "footway",
+        # "service",
+        "track",
+        "services",
+        "cycleway",
+        "steps",
+    ]:
+        return False
 
     name = node["name"]
     if exclude is not None:
@@ -97,7 +109,7 @@ def print_list(l: list):
 
 
 def main():
-    with open("res.json", "r") as f:
+    with open("/home/atisha/Downloads/res.json", "r") as f:
         data = json.load(f)
 
     new_data = []
@@ -114,14 +126,22 @@ def main():
     data = new_data
     # Filter out specific words/characters
     data = [x for x in data if filter(x, exclude=EXCLUDE_FILTER)]
-    names = list(set([x["name"] for x in data]))
-    # Remove spaces from beginning and end
-    names = [x.strip(" ") for x in names]
 
-    names.sort(key=lambda x: len(x))
-    # names.sort(key=lambda x: len(x) - x.count(" "))
-    print_list(names[-1000:])
-    print(f"Average length: {sum((len(x) for x in names)) / len(names)}")
+    unique_data_dict = {}
+    for x in data:
+        # Remove spaces from beginning and end
+        x["name"] = x["name"].strip(" ")
+        unique_data_dict[x["name"]] = x
+
+    unique_data = list(unique_data_dict.values())
+    unique_data.sort(key=lambda x: len(x["name"]))
+    final_output = [
+        {"name": x["name"], "highway": x.get("highway")} for x in unique_data[-1000:]
+    ]
+    print_list(final_output)
+
+    avg_len = sum(len(x["name"]) for x in unique_data) / len(unique_data)
+    print(f"Average length: {avg_len}")
 
 
 if __name__ == "__main__":

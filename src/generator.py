@@ -129,8 +129,7 @@ def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
                 generate_file_viewer(entry_path, False)
                 dirs.append({"name": entry_path.name + "/", "url": entry_path})
             else:
-                # index.html is what we generate here
-                if entry_path.name == "index.html":
+                if entry_path.name in ["index.html", ".gitignore"]:
                     continue
 
                 with open(entry_path, "r") as f:

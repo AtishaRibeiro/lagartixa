@@ -43,6 +43,38 @@ h2 {
   font-size: 1.8rem;
 }
 
+table {
+  margin: auto;
+  width: 100%;
+
+  border: 2px solid;
+  text-align: center;
+  /* padding: 5px; */
+  border-radius: 7px;
+  /* border-collapse: collapse; */
+  border-spacing: 0;
+}
+
+td {
+  padding: 3px;
+}
+
+tr th:nth-child(1) {
+  padding-left: 6px;
+}
+
+tr td:nth-child(1) {
+  padding-left: 6px;
+}
+
+tbody tr:nth-child(odd) {
+  background-color: #F3F3F3;
+}
+
+tbody tr:nth-child(even) {
+  background-color: #E0E0F0;
+}
+
 img {
   mix-blend-mode: darken;
 }
