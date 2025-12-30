@@ -55,6 +55,10 @@ table {
   border-spacing: 0;
 }
 
+thead th {
+  line-height: 2;
+}
+
 td {
   padding: 3px;
 }

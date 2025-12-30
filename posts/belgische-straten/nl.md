@@ -6,8 +6,7 @@ Bij mij in de buurt is er een straat met de behoorlijk lange naam "Tweekleineweg
 Buiten het feit dat iemand precies niet kon beslissen of het nu 1 straat is of 2 (kleine) wegen, heb ik mij al vaker afgevraagd of dit niet een van de langere straatnamen in België zou zijn. 
 Gelukkig is die vraag beantwoorden tegenwoordig redelijk makkelijk, en een dagje prutsen met Python en OpenStreetMaps geeft ons het antwoord (en meer)!
 
-
-De top 10 ziet er als volgt uit:
+Mijn lokale straat staat met zijn ocharme 21 karakters niet eens in de buurt van de top 10:
 
 <table>
   <thead>
@@ -90,7 +89,7 @@ De top 10 ziet er als volgt uit:
 
 _<sup>1</sup>Ik weet dat Brussel geen provincie is maar zo blijft de tabel simpel!_
 
-### Allée Adrienne Gommers & Anne-Marie van Oost-de-Gerlache
+## Allée Adrienne Gommers & Anne-Marie van Oost-de-Gerlache
 
 Zelfs als we spaties niet meetellen, is het nog steeds 50 karakters lang, en nog steeds de langste straatnaam.
 De Nederlandse tegenhanger is 1 karakter korter, en enkel omdat er geen spatie is voor _dreef_: **Adrienne Gommers & Anne-Marie van Oost-de Gerlachedreef**.
@@ -99,9 +98,9 @@ Deze is pas in 2023 [ingehuldigd geweest](https://www.listedubourgmestre-wsl.be/
 
 Is dit een echte straat? Misschien. Het voelt eerder aan als een nieuwigheid, vooral omdat ge hier enkel kunt parkeren, en er is bijvoorbeeld geen enkel gebouw met dit adres.
 
-### Rue du 127ème Régiment d'Infanterie Française
+## Rue du 127e Régiment d'Infanterie Française
 
-Maar wacht, zo simpel is het toch niet. Er zijn in Wallonie behoorlijk wat straatnamen die verwijzen naar een infanterieregiment, samen met het relevante nummer. Hier heb ik besloten om deze niet volledig uit te schrijven<sup>2</sup>, aangezien dat zelden gedaan wordt in het echte leven. Toch denk ik dat het relevant is om hier rekening mee te houden, aangezien lange nummers wel een impact hebben op de uitspraak.   
+Maar wacht, zo simpel is het toch niet. Er zijn in Wallonie behoorlijk wat straatnamen die verwijzen naar een infanterieregiment, samen met hun relevante nummer. Hier heb ik besloten om deze niet volledig uit te schrijven<sup>2</sup>, aangezien dat zelden gedaan wordt in het echte leven. Toch denk ik dat het relevant is om hier rekening mee te houden, aangezien lange nummers wel een impact hebben op de uitspraak.   
 
 De lengte van de straatnaam als we de nummers uitschrijven, staat weergegeven tussen haakjes. In dat geval heeft **Rue du Cent Vingt-Septième Régiment d'Infanterie Française** ongetwijfeld de langste naam.
 
@@ -109,11 +108,11 @@ Blijkt dat zo'n lange straatnaam best vervelend is, met als gevolg dat dit op he
 
 _<sup>2</sup>Ik heb hier de afkorting 'e' gebruikt volgens [l'Academie Francaise](https://www.academie-francaise.fr/abreviations-des-adjectifs-numeraux), ook al wordt dit niet altijd gerespecteerd op de borden..._
 
-### Ietsstraat
+## Varia
 
-Ik hoor u al zeggen: "Maar dat is een dreef, geen straat!". Allez dan, als straat er per se in hoeft te staan dan komen we uit op [ietsstraat].
+Als laatste heb ik nog de langste straatnamen gevonden voor een paar andere categorieën en de gemiddelde lengte per provincie ([[belgie-ingevuld]]).
 
-Zo kunnen we nog een paar andere categorieen verzinnen: 
+De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) vinden.
 
 <table>
   <thead>
@@ -137,14 +136,13 @@ Zo kunnen we nog een paar andere categorieen verzinnen:
     <td>Oostende</td>
     <td>West-Vlaanderen</td>
   </tr>
+  <tr>
+    <td>Duits</td>
+    <td>Kelmiser Mühle Mühlenteichweg</td>
+    <td>Kelmis</td>
+    <td>Luik</td>
+  </tr>
   </tbody>
 </table>
 
-## De provincie met de langste straatnamen
-
-In OpenStreetMaps' data zitten er ook heel wat exotische lange straatnamen als "Dit stuk verharding hoort bij de Pastoriestraat" en "Toegangsweg naar achterliggende garage". Helaas vrees ik dat dit maar beschrijvingen zijn van kleine naamloze wegjes en dat ik hier nooit mijn officieel adres van ga kunnen maken. 
-
-Ik heb mijn best gedaan om deze categorie van "straatnamen" eruit te filteren, en dat geeft de resulaten in [[afbeelding]]. Henegouwen is de duidelijk de winnaar met een gemiddelde straatnaam lengte van 17.XX karakters.
-
-
-De code die ik heb gebruikt kunt ge [hier](/files/street-names) vinden.
+![provincie-gemiddeldes](images/belgie-ingevuld.jpg "Gemiddelde straatnaam lengte per provincie")

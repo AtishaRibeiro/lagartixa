@@ -15,6 +15,12 @@ from marko import Parser, Renderer, convert
 
 import util
 
+FIGURE_NAMES = {
+    "en": "Figure",
+    "fr": "Image",
+    "nl": "Afbeelding",
+}
+
 
 @dataclass
 class Post:
@@ -89,11 +95,12 @@ def add_footer(
         soup.append(get_date_p("Edited", date_edited))
 
 
-def process_figures(soup: BeautifulSoup, dir: pathlib.Path) -> None:
+def process_figures(soup: BeautifulSoup, dir: pathlib.Path, language: str) -> None:
     """Process images and videos"""
 
     img_counter = 1
     img_dict = {}
+    figure_name = FIGURE_NAMES[language]
 
     for img in soup.find_all("img"):
         if img.get("id") == "site-logo":
@@ -103,7 +110,7 @@ def process_figures(soup: BeautifulSoup, dir: pathlib.Path) -> None:
         img["src"] = img_src
         img_title = img.get("title")
         img_id = img_src.stem.replace(" ", "-")
-        img_dict[img_id] = f"Figure {img_counter}"
+        img_dict[img_id] = f"{figure_name} {img_counter}"
 
         if img_src.suffix == ".webm":
             class_prefix = "video-"
@@ -129,9 +136,9 @@ def process_figures(soup: BeautifulSoup, dir: pathlib.Path) -> None:
             continue
 
         if img_title:
-            title = f"<b>Figure {img_counter}:</b> {img_title}"
+            title = f"<b>{figure_name} {img_counter}:</b> {img_title}"
         else:
-            title = f"<b>Figure {img_counter}</b>"
+            title = f"<b>{figure_name} {img_counter}</b>"
 
         title_soup = BeautifulSoup(title, "html.parser")
         title = soup.new_tag("p", attrs={"class": f"{class_prefix}title"})
@@ -171,7 +178,7 @@ def generate_post_html(post: Post) -> None:
 
     anchor_headers(html)
     syntax_highlighting(html)
-    process_figures(html, post_dir)
+    process_figures(html, post_dir, post.language)
     add_footer(html, post.date, post.edited)
 
     env = Environment(loader=FileSystemLoader("templates"))

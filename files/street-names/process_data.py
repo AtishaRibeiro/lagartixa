@@ -66,8 +66,6 @@ EXCLUDE_FILTER = [
     # Specific "streets"
     "avenue marie-thérèse et andré dujardin-simoenslaan",
     "1000 bornes à vélo région hainaut-est",
-    " ",
-    "-",
 ]
 
 
@@ -83,15 +81,20 @@ def filter(
     if node["highway"] in [
         "path",
         "footway",
-        # "service",
         "track",
         "services",
         "cycleway",
         "steps",
+        "pedestrian",
+        "rest_area",
+        "corridor",
     ]:
         return False
 
     name = node["name"]
+    if len(name) < 3:
+        return False
+
     if exclude is not None:
         for f in exclude:
             if f in name.lower():
