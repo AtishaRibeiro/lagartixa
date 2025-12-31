@@ -11,7 +11,15 @@ img {
 .post-title {
   font-size: 1.25rem;
   font-weight: bold;
-  margin-top: 40px;
+  margin-bottom: 0px;
+}
+
+.post-title-alt {
+  font-size: 1rem;
+  font-style: italic;
+  margin-top: 0px;
+  margin-bottom: 0px;
+  color: #303030;
 }
 
 .post-card {
@@ -21,8 +29,7 @@ img {
   border-radius: 8px;
   overflow: hidden;
   position: relative;
-  padding-left: 20px;
-  padding-right: 20px;
+  padding: 20px;
   margin-bottom: 20px;
   background-color: white;
   filter: drop-shadow(0 0 0.1rem gray);

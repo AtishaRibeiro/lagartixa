@@ -21,6 +21,18 @@ FIGURE_NAMES = {
     "nl": "Afbeelding",
 }
 
+PUBLISHED_NAME = {
+    "en": "Published",
+    "fr": "Publicé",
+    "nl": "Gepubliceerd",
+}
+
+EDITED_NAME = {
+    "en": "Edited",
+    "fr": "Edité",
+    "nl": "Aangepast",
+}
+
 
 @dataclass
 class Post:
@@ -84,15 +96,15 @@ def syntax_highlighting(soup: BeautifulSoup) -> None:
 
 
 def add_footer(
-    soup: BeautifulSoup, date_published: str, date_edited: str | None
+    soup: BeautifulSoup, date_published: str, date_edited: str | None, language: str
 ) -> None:
     def get_date_p(text: str, date: str) -> BeautifulSoup:
         soup = f'<p class="footer">{text}: {date}</p>'
         return BeautifulSoup(soup, "html.parser")
 
-    soup.append(get_date_p("Published", date_published))
+    soup.append(get_date_p(PUBLISHED_NAME[language], date_published))
     if date_edited is not None:
-        soup.append(get_date_p("Edited", date_edited))
+        soup.append(get_date_p(EDITED_NAME[language], date_edited))
 
 
 def process_figures(soup: BeautifulSoup, dir: pathlib.Path, language: str) -> None:
@@ -179,7 +191,7 @@ def generate_post_html(post: Post) -> None:
     anchor_headers(html)
     syntax_highlighting(html)
     process_figures(html, post_dir, post.language)
-    add_footer(html, post.date, post.edited)
+    add_footer(html, post.date, post.edited, post.language)
 
     env = Environment(loader=FileSystemLoader("templates"))
     base_template = env.get_template("base.html")
@@ -245,23 +257,24 @@ def generate_post_index_html(posts: list[Post]) -> None:
     class PostIndex:
         dir: str
         languages: list
-        title: str
+        titles: list[str]
         date: str
 
     post_dict = {}
     for post in posts:
         if post.root_dir not in post_dict:
             post_dict[post.root_dir] = PostIndex(
-                str(post.root_dir), [post.language], post.title, post.date
+                str(post.root_dir), [post.language], [post.title], post.date
             )
         else:
             post_dict[post.root_dir].languages.append(post.language)
+            post_dict[post.root_dir].titles.append(post.title)
 
     env = Environment(loader=FileSystemLoader("templates"))
-    base_template = env.get_template("base.html")
     posts_template = env.get_template("posts.html")
-
     posts_rendered = posts_template.render(posts=post_dict.values())
+
+    base_template = env.get_template("base.html")
     page_rendered = base_template.render(
         contents=posts_rendered,
         styles=["static/main.css", "static/posts.css"],
@@ -284,7 +297,7 @@ def generate_posts_html(languages: list[str]) -> None:
     for post in posts:
         generate_post_html(post)
 
-        # Create a symlink that points to the main post
+        # Create a symlink that points to the main language post
         # This way `posts/<name>/` is also a valid url
         if post.main:
             index = post.root_dir / "index.html"

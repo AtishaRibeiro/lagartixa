@@ -4,8 +4,17 @@
   <a href="{{ post.dir }}" class="post-link">
     <div class="post-card">
       <p class="post-date">{{ post.date }}</p>
-      <p class="post-title">{{ post.title }}</p>
-      <p class="post-langs">{{ post.languages|join(" ")|upper}}</p>
+      <p class="post-title">{{ post.titles[0] }}</p>
+      {% for title in post.titles[1:] %}
+      <p class="post-title-alt">{{ title }}</p>
+      {% endfor %}
+
+      <p class="post-langs">
+        {% for lang in post.languages %}
+        <span>{{ lang | upper }}</span>
+        {% endfor %}
+      </p>
+
     </div>
   </a>
 
