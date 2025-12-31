@@ -194,7 +194,10 @@ def generate_post_html(post: Post) -> None:
         f.write(post_rendered)
 
 
-def get_all_post_info() -> list[Post]:
+def get_all_post_infos() -> list[Post]:
+    """Go over all dirs in `posts/` and create a list of all posts
+    that should be generated."""
+
     posts = []
     with os.scandir("posts") as it:
         for entry in it:
@@ -215,27 +218,29 @@ def get_all_post_info() -> list[Post]:
             with open(info_file, "r") as f:
                 info = yaml.safe_load(f)
             base_post.overwrite_with_dict(info)
-            languages = info.get("languages", [])
+            languages = info.get("languages", {})
 
-            for i, language in enumerate(languages):
+            for i, (language, language_info) in enumerate(languages.items()):
                 post = copy.deepcopy(base_post)
                 post.language = language
                 post.main = i == 0
-                lang_file = post.get_info_file_path()
+
+                lang_file = post.get_md_path()
                 if not lang_file.exists():
-                    print(f"Skipping post for language '{language}', no yml file found")
+                    print(f"Skipping post for language '{language}', no md file found")
                     continue
 
-                with open(lang_file, "r") as f:
-                    info = yaml.safe_load(f)
+                if language_info is not None:
+                    post.overwrite_with_dict(language_info)
 
-                post.overwrite_with_dict(info)
                 posts.append(post)
 
     return posts
 
 
 def generate_post_index_html(posts: list[Post]) -> None:
+    """Generate the `/posts` page, which links to all posts"""
+
     @dataclass
     class PostIndex:
         dir: str
@@ -268,7 +273,10 @@ def generate_post_index_html(posts: list[Post]) -> None:
 
 
 def generate_posts_html(languages: list[str]) -> None:
-    posts: list[Post] = get_all_post_info()
+    """Go over all posts in `posts/` and generate their pages +
+    the posts index page"""
+
+    posts: list[Post] = get_all_post_infos()
     posts = [x for x in posts if x.published]
     posts.sort(key=lambda post: post.date, reverse=True)
 

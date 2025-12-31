@@ -1,3 +1,5 @@
 date: 2025-09-25
 languages:
-  - en
+  en:
+    title: Turning the globe into a 3D mesh
+    published: true
