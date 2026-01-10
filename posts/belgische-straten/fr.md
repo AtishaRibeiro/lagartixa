@@ -90,7 +90,7 @@ _<sup>1</sup>Je sais que Bruxelles n'est pas une province mais comme ça le tabl
 ## Allée Adrienne Gommers & Anne-Marie van Oost-de-Gerlache
 Même si on ne compte pas les espaces, ça fait encore 50 caractères, et ça reste quand même le plus long nom de rue. L'équivalent néerlandais est plus court d’un caractère, mais seulement parce qu'il n'y a pas d'espace devant '_dreef_': **Adrienne Gommers & Anne-Marie van Oost-de Gerlachedreef**.
 
-Celle-ci [etait inaugurée](https://www.listedubourgmestre-wsl.be/inauguration-de-lallee-adrienne-gommers-anne-marie-van-oost-de-gerlache/) seulement en 2023 et est, crois-le ou non, nommée d'après Adrienne Gommers et Anne-Marie van Oost-De-Gerlache, 2 femmes de la résistance.
+Celle-ci [était inaugurée](https://www.listedubourgmestre-wsl.be/inauguration-de-lallee-adrienne-gommers-anne-marie-van-oost-de-gerlache/) seulement en 2023 et est, crois-le ou non, nommée d'après Adrienne Gommers et Anne-Marie van Oost-De-Gerlache, 2 femmes de la résistance.
 Autre fait intéressant: Anne-Marie était mariée au fils de Adrien de Gerlache, qui a fait le premier hivernage en Antarctique.
 
 Est-ce une vraie rue? Peut-être, mais ça a plutôt l'air d'être un monument, surtout qu'on ne peut qu'y garer sa voiture et il n'y a aucun bâtiment avec cette adresse.
@@ -103,7 +103,7 @@ J'ai noté la longueur des numéros notés en toutes lettres entre parenthèses 
 
 Apparemment un nom de rue si long est plutôt embêtant, et par conséquent résumé sur la plaque à **Rue du 127 ième RIF**. Pas si long en fin de compte, hein?
 
-_<sup>2</sup>Ici j'ai utilisé l'abréviation 'e' en suivant les règles [l'Academie Francaise](https://www.academie-francaise.fr/abreviations-des-adjectifs-numeraux), même si ce n'est pas toujours respecté sur les plaques de rue..._
+_<sup>2</sup>Ici j'ai utilisé l'abréviation 'e' en suivant les règles [l'Académie Française](https://www.academie-francaise.fr/abreviations-des-adjectifs-numeraux), même si ce n'est pas toujours respecté sur les plaques de rue..._
 
 ## Par province
 ![provincie-moyennes](images/belgie-ingevuld.jpg "Longueur moyenne par province")
