@@ -23,13 +23,13 @@ FIGURE_NAMES = {
 
 PUBLISHED_NAME = {
     "en": "Published",
-    "fr": "Publicé",
+    "fr": "Publié",
     "nl": "Gepubliceerd",
 }
 
 EDITED_NAME = {
     "en": "Edited",
-    "fr": "Edité",
+    "fr": "Modifié",
     "nl": "Aangepast",
 }
 

@@ -6,6 +6,8 @@ Bij mij in de buurt is er een straat met de behoorlijk lange naam "Tweekleineweg
 Buiten het feit dat iemand precies niet kon beslissen of het nu 1 straat is of 2 (kleine) wegen, heb ik mij al vaker afgevraagd of dit niet een van de langere straatnamen in België zou zijn. 
 Gelukkig is die vraag beantwoorden tegenwoordig redelijk makkelijk, en een dagje prutsen met Python en OpenStreetMaps geeft ons het antwoord (en meer)!
 
+De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) vinden.
+
 Mijn lokale straat staat met zijn ocharme 21 karakters niet eens in de buurt van de top 10:
 
 <table>
@@ -102,17 +104,23 @@ Is dit een echte straat? Misschien. Het voelt eerder aan als een nieuwigheid, vo
 
 Maar wacht, zo simpel is het toch niet. Er zijn in Wallonie behoorlijk wat straatnamen die verwijzen naar een infanterieregiment, samen met hun relevante nummer. Hier heb ik besloten om deze niet volledig uit te schrijven<sup>2</sup>, aangezien dat zelden gedaan wordt in het echte leven. Toch denk ik dat het relevant is om hier rekening mee te houden, aangezien lange nummers wel een impact hebben op de uitspraak.   
 
-De lengte van de straatnaam als we de nummers uitschrijven, staat weergegeven tussen haakjes. In dat geval heeft **Rue du Cent Vingt-Septième Régiment d'Infanterie Française** ongetwijfeld de langste naam.
+De lengte van de straatnaam als we de nummers uitschrijven, staat weergegeven tussen haakjes in de tabel. In dat geval heeft **Rue du Cent Vingt-Septième Régiment d'Infanterie Française** ongetwijfeld de langste naam.
 
 Blijkt dat zo'n lange straatnaam best vervelend is, met als gevolg dat dit op het straatnaambord wordt verkort tot **Rue du 127 ième RIF**. Zo lang is dat dan toch ineens niet meer.
 
 _<sup>2</sup>Ik heb hier de afkorting 'e' gebruikt volgens [l'Academie Francaise](https://www.academie-francaise.fr/abreviations-des-adjectifs-numeraux), ook al wordt dit niet altijd gerespecteerd op de borden..._
 
+## Per provincie
+
+![provincie-gemiddeldes](images/belgie-ingevuld.jpg "Gemiddelde straatnaamlengte per provincie")
+
+[[belgie-ingevuld]] toont dat alle franstalige provincies langere namen hebben dan de nederlandstalige. Op zich niet onlogisch aangezien de bezitsvorm in het Nederlands minder letters/woorden nodig heeft dan in het Frans. Neem bijvoorbeeld **Burgemeester Etienne Demunterlaan** en **Avenue du Bourgmestre Etienne Demunter**: Waar ge in het Nederlands gewoon _'laan'_ op het einde kunt toevoegen, moet ge in het Frans _'avenue de'_ gebruiken. Zelfs wanneer het woord korter is in het Frans kan het nog steeds langer uitkomen: _'rue de la'_ is 3 karakters langer dan _'straat'_.
+
+De overduidelijke winnaar is Waals-Brabant met een gemiddelde lengte van 17.8. Antwerpen en Limburg zitten allebei vanonder in de lijst, hoewel Antwerpen de eigenlijke laatste plaats heeft met een gemiddelde lengte van 13.25 tegenover Limburgs 13.28. 
+
 ## Varia
 
-Als laatste heb ik nog de langste straatnamen gevonden voor een paar andere categorieën en de gemiddelde lengte per provincie ([[belgie-ingevuld]]).
-
-De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) vinden.
+Als laatste heb ik nog de langste straatnamen gevonden voor een paar andere categorieën, waaronder langste naam bestaande uit 1 woord zoals **Tweekleinewegenstraat**. Zelfs in die categorie staat die straat (samen met 78 andere straten!) enkel op de 63e plaats.
 
 <table>
   <thead>
@@ -125,7 +133,7 @@ De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) v
   </thead>
   <tbody>
   <tr>
-    <td>geen spaties</td>
+    <td>Geen spaties</td>
     <td>Onze-Lieve-Vrouw-ten-Spiegelestraat</td>
     <td>Kortrijk</td>
     <td>West-Vlaanderen</td>
@@ -137,6 +145,24 @@ De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) v
     <td>West-Vlaanderen</td>
   </tr>
   <tr>
+    <td>Meeste woorden</td>
+    <td>Rue du 1er Régiment des Chasseurs à Cheval</td>
+    <td>Doornik</td>
+    <td>Henegouwen</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Chemin du Point de Vue de la Sibérie</td>
+    <td>Profondeville</td>
+    <td>Namen</td>
+  </tr>
+  <tr>
+    <td></td>
+    <td>Cul de Sac de la rue Des Récollets</td>
+    <td>Doornik</td>
+    <td>Henegouwen</td>
+  </tr>
+  <tr>
     <td>Duits</td>
     <td>Kelmiser Mühle Mühlenteichweg</td>
     <td>Kelmis</td>
@@ -145,4 +171,3 @@ De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) v
   </tbody>
 </table>
 
-![provincie-gemiddeldes](images/belgie-ingevuld.jpg "Gemiddelde straatnaam lengte per provincie")
