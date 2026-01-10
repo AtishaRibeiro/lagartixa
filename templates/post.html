@@ -1,0 +1,27 @@
+<div class="img-root">
+  <div class="img-div">
+    <img alt="{{ post.img_alt }}" src="/{{ post.root_dir / post.img_path }}"/>
+  </div>
+</div>
+
+<h1>{{post.title}}</h1>
+
+{% if post.available_languages|length > 1 %}
+<div class="language-selector">
+  {% for lang in post.available_languages %}
+  <a class="language-select {{ 'language-not-selected' if post.language != lang else '' }}" href="/{{ post.root_dir / lang }}">
+    <img alt="lang-select-{{ lang }}" src="/static/icons/{{ lang }}.jpg"/>
+  </a>
+  {% endfor %}
+</div>
+{% endif %}
+
+{{content}}
+
+{% if post.date %}
+  <p class="footer">{{ localisation["published"][post.language] }}: {{ post.date }}</p>
+{% endif %}
+
+{% if post.edited %}
+  <p class="footer">{{ localisation["edited"][post.language] }}: {{ post.edited }}</p>
+{% endif %}

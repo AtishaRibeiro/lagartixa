@@ -1,0 +1,1 @@
+LANGUAGES = ["en", "nl", "fr"]

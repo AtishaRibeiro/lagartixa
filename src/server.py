@@ -26,8 +26,7 @@ def static_page(page):
     path = pathlib.Path(page)
 
     print(path)
-    if path.suffix in [".png", ".jpg", ".webm"]:
-        print(path)
+    if path.suffix in [".png", ".jpg", ".webm", ".py", ".txt"]:
         return send_from_directory(os.path.join("..", path.parent), path.name)
 
     if pathlib.Path(f"{page}.html").exists():
@@ -60,8 +59,8 @@ def observe_file():
     event_handler = FileModifiedHandler(
         patterns=[
             "templates/*.html",
-            "src/generator.py",
-            "posts/**/text.md",
+            "src/**.py",
+            "posts/**/*.md",
             "posts/**/info.yml",
         ],
         ignore_directories=True,

@@ -1,3 +1,11 @@
-title: De langste straatnaam van België
-published: false
-date: 2025-10-25
+date: 2026-01-10
+published: true
+languages:
+  nl:
+    title: De langste straatnaam van België
+    img-path: images/dreef.jpg
+    img-alt: dreef-brussel 
+  fr:
+    title: Le plus long nom de rue en Belgique
+    img-path: images/dreef.jpg
+    img-alt: dreef-brussel 
