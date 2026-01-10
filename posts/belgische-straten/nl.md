@@ -1,10 +1,6 @@
-![dreef-brussel](images/dreef.jpg)
-
-# De langste straatnaam van België
-
 Bij mij in de buurt is er een straat met de behoorlijk lange naam "Tweekleinewegenstraat". 
 Buiten het feit dat iemand precies niet kon beslissen of het nu 1 straat is of 2 (kleine) wegen, heb ik mij al vaker afgevraagd of dit niet een van de langere straatnamen in België zou zijn. 
-Gelukkig is die vraag beantwoorden tegenwoordig redelijk makkelijk, en een dagje prutsen met Python en OpenStreetMaps geeft ons het antwoord (en meer)!
+Gelukkig is die vraag beantwoorden tegenwoordig redelijk makkelijk, en een dagje prutsen met Python en [OpenStreetMap](https://www.openstreetmap.org) geeft ons het antwoord (en meer)!
 
 De code die ik heb gebruikt voor deze post kunt ge [hier](/files/street-names) vinden.
 
@@ -93,8 +89,8 @@ _<sup>1</sup>Ik weet dat Brussel geen provincie is maar zo blijft de tabel simpe
 
 ## Allée Adrienne Gommers & Anne-Marie van Oost-de-Gerlache
 
-Zelfs als we spaties niet meetellen, is het nog steeds 50 karakters lang, en nog steeds de langste straatnaam.
-De Nederlandse tegenhanger is 1 karakter korter, en enkel omdat er geen spatie is voor _dreef_: **Adrienne Gommers & Anne-Marie van Oost-de Gerlachedreef**.
+Zelfs als we spaties niet meetellen, is deze nog steeds 50 karakters lang, en nog steeds de langste straatnaam.
+De Nederlandse tegenhanger is 1 karakter korter, en enkel omdat er geen spatie is voor _'dreef'_: **Adrienne Gommers & Anne-Marie van Oost-de Gerlachedreef**.
 
 Deze is pas in 2023 [ingehuldigd geweest](https://www.listedubourgmestre-wsl.be/inauguration-de-lallee-adrienne-gommers-anne-marie-van-oost-de-gerlache/) en is (ongelooflijk maar waar) vernoemd naar Adrienne Gommers en Anne-Marie van Oost-de-Gerlache, twee vrouwen die meezaten in het verzet. Ook interessant is dat Anne-Marie getrouwd was met de zoon van Adrien de Gerlache, die de eerste overwintering deed binnen de Antarctische cirkel.
 
@@ -102,7 +98,7 @@ Is dit een echte straat? Misschien. Het voelt eerder aan als een nieuwigheid, vo
 
 ## Rue du 127e Régiment d'Infanterie Française
 
-Maar wacht, zo simpel is het toch niet. Er zijn in Wallonie behoorlijk wat straatnamen die verwijzen naar een infanterieregiment, samen met hun relevante nummer. Hier heb ik besloten om deze niet volledig uit te schrijven<sup>2</sup>, aangezien dat zelden gedaan wordt in het echte leven. Toch denk ik dat het relevant is om hier rekening mee te houden, aangezien lange nummers wel een impact hebben op de uitspraak.   
+Maar wacht, zo simpel is het toch niet. Er zijn in Wallonië behoorlijk wat straatnamen die verwijzen naar een infanterieregiment, samen met hun relevante nummer. Hier heb ik besloten om deze niet volledig uit te schrijven<sup>2</sup>, aangezien dat zelden gedaan wordt in het echte leven. Toch denk ik dat het relevant is om hier rekening mee te houden, aangezien lange nummers wel een impact hebben op de uitspraak.   
 
 De lengte van de straatnaam als we de nummers uitschrijven, staat weergegeven tussen haakjes in de tabel. In dat geval heeft **Rue du Cent Vingt-Septième Régiment d'Infanterie Française** ongetwijfeld de langste naam.
 
@@ -116,7 +112,7 @@ _<sup>2</sup>Ik heb hier de afkorting 'e' gebruikt volgens [l'Academie Francaise
 
 [[belgie-ingevuld]] toont dat alle franstalige provincies langere namen hebben dan de nederlandstalige. Op zich niet onlogisch aangezien de bezitsvorm in het Nederlands minder letters/woorden nodig heeft dan in het Frans. Neem bijvoorbeeld **Burgemeester Etienne Demunterlaan** en **Avenue du Bourgmestre Etienne Demunter**: Waar ge in het Nederlands gewoon _'laan'_ op het einde kunt toevoegen, moet ge in het Frans _'avenue de'_ gebruiken. Zelfs wanneer het woord korter is in het Frans kan het nog steeds langer uitkomen: _'rue de la'_ is 3 karakters langer dan _'straat'_.
 
-De overduidelijke winnaar is Waals-Brabant met een gemiddelde lengte van 17.8. Antwerpen en Limburg zitten allebei vanonder in de lijst, hoewel Antwerpen de eigenlijke laatste plaats heeft met een gemiddelde lengte van 13.25 tegenover Limburgs 13.28. 
+De overduidelijke winnaar is Waals-Brabant met een gemiddelde lengte van 17.8. Antwerpen en Limburg zitten allebei vanonder in de lijst, hoewel Antwerpen de eigenlijke laatste plaats heeft met een gemiddelde lengte van 13.25 tegenover Limburg zijn 13.28. 
 
 ## Varia
 

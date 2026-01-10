@@ -3,5 +3,9 @@ published: true
 languages:
   nl:
     title: De langste straatnaam van België
+    img-path: images/dreef.jpg
+    img-alt: dreef-brussel 
   fr:
     title: Le plus long nom de rue en Belgique
+    img-path: images/dreef.jpg
+    img-alt: dreef-brussel 

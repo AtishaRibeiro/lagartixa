@@ -3,3 +3,5 @@ languages:
   en:
     title: Turning the globe into a 3D mesh
     published: true
+    img-alt: mesh-globe 
+    img-path: images/mesh.jpg

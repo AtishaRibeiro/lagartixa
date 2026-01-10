@@ -1,6 +1,3 @@
-![dreef-brussel](images/dreef.jpg)
-
-# Le plus long nom de rue en Belgique
 Chez moi il y a une rue avec un nom assez long "Tweekleinewegenstraat" (Rue des deux petits chemins).
 À part que quelqu'un ne pouvait pas décider si c'était une rue ou deux (petits) chemins, je me suis demandé plusieur fois si ça n'était pas le nom le plus long de Belgique.
 Heureusement répondre cette question est plutôt facile aujourd'hui, et en bidouillant avec Python et [OpenStreetMap](https://www.openstreetmap.org) on a la réponse (et plus encore)!

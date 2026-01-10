@@ -3,7 +3,7 @@ import pathlib
 import yaml
 import re
 import copy
-from dataclasses import dataclass
+from dataclasses import dataclass, field
 from typing import Optional
 
 from bs4 import BeautifulSoup
@@ -15,32 +15,20 @@ from marko import Parser, Renderer, convert
 
 import util
 
-FIGURE_NAMES = {
-    "en": "Figure",
-    "fr": "Image",
-    "nl": "Afbeelding",
-}
-
-PUBLISHED_NAME = {
-    "en": "Published",
-    "fr": "Publié",
-    "nl": "Gepubliceerd",
-}
-
-EDITED_NAME = {
-    "en": "Edited",
-    "fr": "Modifié",
-    "nl": "Aangepast",
-}
+with open("src/localisation.yml", "r") as f:
+    LOCALISATION = yaml.safe_load(f)
 
 
 @dataclass
 class Post:
     root_dir: pathlib.Path
     title: str = "No title"
+    img_path: str = ""
+    img_alt: str = ""
     date: str = "1997-12-22"
     edited: Optional[str] = None
     language: str = "en"
+    available_languages: list = field(default_factory=lambda: [])
     published: bool = False
     # Whether this language is the main version of the post
     main: bool = False
@@ -57,6 +45,10 @@ class Post:
     def overwrite_with_dict(self, d: dict):
         if v := d.get("title"):
             self.title = v
+        if v := d.get("img-path"):
+            self.img_path = v
+        if v := d.get("img-alt"):
+            self.img_alt = v
         if v := d.get("date"):
             self.date = v
         if v := d.get("edited"):
@@ -95,24 +87,12 @@ def syntax_highlighting(soup: BeautifulSoup) -> None:
         block.append(parsed)
 
 
-def add_footer(
-    soup: BeautifulSoup, date_published: str, date_edited: str | None, language: str
-) -> None:
-    def get_date_p(text: str, date: str) -> BeautifulSoup:
-        soup = f'<p class="footer">{text}: {date}</p>'
-        return BeautifulSoup(soup, "html.parser")
-
-    soup.append(get_date_p(PUBLISHED_NAME[language], date_published))
-    if date_edited is not None:
-        soup.append(get_date_p(EDITED_NAME[language], date_edited))
-
-
 def process_figures(soup: BeautifulSoup, dir: pathlib.Path, language: str) -> None:
     """Process images and videos"""
 
     img_counter = 1
     img_dict = {}
-    figure_name = FIGURE_NAMES[language]
+    figure_name = LOCALISATION["figure"][language]
 
     for img in soup.find_all("img"):
         if img.get("id") == "site-logo":
@@ -191,15 +171,21 @@ def generate_post_html(post: Post) -> None:
     anchor_headers(html)
     syntax_highlighting(html)
     process_figures(html, post_dir, post.language)
-    add_footer(html, post.date, post.edited, post.language)
 
     env = Environment(loader=FileSystemLoader("templates"))
-    base_template = env.get_template("base.html")
+    post_template = env.get_template("post.html")
+    post_rendered = post_template.render(
+        content=str(html), post=post, localisation=LOCALISATION
+    )
 
     rel_dir = util.get_relative_dir_offset(str(post_dir))
     css = os.path.join(rel_dir, "static", "main.css")
+    base_template = env.get_template("base.html")
     post_rendered = base_template.render(
-        contents=str(html), styles=[css], _class="centered-column", root_path=rel_dir
+        contents=post_rendered,
+        styles=[css],
+        _class="centered-column",
+        root_path=rel_dir,
     )
 
     with open(post.get_html_path(), "w") as f:
@@ -235,6 +221,7 @@ def get_all_post_infos() -> list[Post]:
             for i, (language, language_info) in enumerate(languages.items()):
                 post = copy.deepcopy(base_post)
                 post.language = language
+                post.available_languages = languages.keys()
                 post.main = i == 0
 
                 lang_file = post.get_md_path()

@@ -114,6 +114,22 @@ img {
   margin: auto;
 }
 
+.language-selector {
+  display: flex;
+  width: 100%;
+  justify-content: center;
+  margin-top: -20px;
+  margin-bottom: 30px;
+}
+
+.language-select>img{
+  width: 50px;
+}
+
+.language-not-selected {
+  filter: opacity(30%);
+}
+
 .img-title,
 .video-title {
   text-align: center;
@@ -173,7 +189,6 @@ code>div>pre {
 
 details {
   font-size: 0.9rem;
-  overflow-x: scroll;
   color: #8f3f71;
   background: #f8f8f8;
   padding-top: 10px;
@@ -218,6 +233,7 @@ details>div {
   padding-top: 1px;
   padding-left: 20px;
   padding-bottom: 10px;
+  overflow-x: scroll;
 }
 
 details>div::before {
