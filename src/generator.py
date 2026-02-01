@@ -42,9 +42,8 @@ def generate_video_html(video: dict) -> None:
         root_path=rel_dir,
     )
 
-    html_path = os.path.join(videos_dir, f"{video["name_link"]}.html")
-    with open(html_path, "w") as f:
-        f.write(post_rendered)
+    html_path = pathlib.Path(videos_dir) / f"{video["name_link"]}.html"
+    util.write_html(html_path, post_rendered)
 
 
 def generate_videos_html() -> None:
@@ -75,8 +74,7 @@ def generate_videos_html() -> None:
         root_path=".",
     )
 
-    with open("videos.html", "w") as f:
-        f.write(page_rendered)
+    util.write_html(pathlib.Path("videos.html"), page_rendered)
 
 
 def generate_simple_html(template: str, destination: str) -> None:
@@ -100,9 +98,7 @@ def generate_simple_html(template: str, destination: str) -> None:
         root_path=".",
     )
 
-    with open(f"{destination}.html", "w") as f:
-        f.write(page_rendered)
-        base_template = env.get_template("base.html")
+    util.write_html(pathlib.Path(f"{destination}.html"), page_rendered)
 
 
 def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
@@ -171,8 +167,7 @@ def generate_file_viewer(dir: pathlib.Path, root: bool) -> None:
         root_path=rel_dir,
     )
 
-    with open(dir / "index.html", "w") as f:
-        f.write(page_rendered)
+    util.write_html(dir / "index.html", page_rendered)
 
 
 @root

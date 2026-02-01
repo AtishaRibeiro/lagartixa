@@ -1,24 +1,15 @@
 @import url("header.css");
 
 @font-face {
-  font-family: dynapuff;
-  src: url("static/fonts/DynaPuff/DynaPuff-VariableFont_wdth,wght.ttf");
-}
-
-@font-face {
-  font-family: shrikhand;
-  src: url("fonts/Shrikhand/Shrikhand-Regular.ttf");
-}
-
-@font-face {
   font-family: merri;
   src: url("fonts/Merriweather/Merriweather-Bold.ttf");
+  font-display: fallback;
 }
 
 body {
   /* center */
-  background: #F6F6F6;
-  color: #0D0D0D;
+  background: #f6f6f6;
+  color: #0d0d0d;
   font-family: roboto;
   font-size: 1.2rem;
   text-align: justify;
@@ -72,11 +63,11 @@ tr td:nth-child(1) {
 }
 
 tbody tr:nth-child(odd) {
-  background-color: #F3F3F3;
+  background-color: #f3f3f3;
 }
 
 tbody tr:nth-child(even) {
-  background-color: #E0E0F0;
+  background-color: #e0e0f0;
 }
 
 img {
@@ -169,7 +160,7 @@ img {
 
 code:not(:has(> *)) {
   color: #515151;
-  background: #DCF2E5;
+  background: #dcf2e5;
   border-radius: 4px;
   padding-left: 3px;
   padding-right: 3px;

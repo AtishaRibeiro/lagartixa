@@ -188,8 +188,7 @@ def generate_post_html(post: Post) -> None:
         root_path=rel_dir,
     )
 
-    with open(post.get_html_path(), "w") as f:
-        f.write(post_rendered)
+    util.write_html(post.get_html_path(), post_rendered)
 
 
 def get_all_post_infos() -> list[Post]:
@@ -268,8 +267,7 @@ def generate_post_index_html(posts: list[Post]) -> None:
         root_path=".",
     )
 
-    with open("posts.html", "w") as f:
-        f.write(page_rendered)
+    util.write_html(pathlib.Path("posts.html"), page_rendered)
 
 
 def generate_posts_html(languages: list[str]) -> None:
